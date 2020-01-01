@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { MetadataArgsStorage } from 'typeorm/metadata-args/MetadataArgsStorage'
 import { TYPEORM_OPTIONS, TYPEORM_NAME, TYPEORM_ENTITIES } from './token';
+export { EntityManager, Repository, Connection, ConnectionManager } from 'typeorm';
 @Module({
     providers: [{
         provide: MetadataArgsStorage,
@@ -94,3 +95,5 @@ export class TypeormModule {
         }
     }
 }
+
+export * from './token';
