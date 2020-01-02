@@ -1,9 +1,10 @@
-import { Connection, ConnectionOptions, QueryRunner, EntityManager, ObjectType, EntitySchema } from 'typeorm'
+import { Connection, ConnectionOptions, QueryRunner, EntityManager, ObjectType, EntitySchema, MongoEntityManager } from 'typeorm'
 import { Injector, getCurrentInjector } from '@nger/core';
 import { NgerEntityManagerFactory } from './EntityManagerFactory';
 import { NgerMongoRepository } from './MongoRepository';
 import { MongoDriver } from 'typeorm/driver/mongodb/MongoDriver';
 import { NgerEntityManager } from './EntityManager';
+import { NgerSelectQueryBuilder } from './SelectQueryBuilder';
 export class NgerConnection extends Connection {
     readonly manager: NgerEntityManager;
     public injector: Injector;
@@ -18,5 +19,18 @@ export class NgerConnection extends Connection {
     }
     createEntityManager(queryRunner?: QueryRunner): EntityManager {
         return new NgerEntityManagerFactory().create(this, queryRunner);
+    }
+
+    createQueryBuilder<Entity>(entityOrRunner?: ObjectType<Entity> | EntitySchema<Entity> | Function | string | QueryRunner, alias?: string, queryRunner?: QueryRunner): NgerSelectQueryBuilder<Entity> {
+        if (this instanceof MongoEntityManager)
+            throw new Error(`Query Builder is not supported by MongoDB.`);
+        if (alias) {
+            const metadata = this.getMetadata(entityOrRunner as Function | EntitySchema<Entity> | string);
+            return new NgerSelectQueryBuilder(this, queryRunner)
+                .select(alias)
+                .from(metadata.target, alias);
+        } else {
+            return new NgerSelectQueryBuilder(this, entityOrRunner as QueryRunner | undefined);
+        }
     }
 }

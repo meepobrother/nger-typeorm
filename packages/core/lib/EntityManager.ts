@@ -2,7 +2,7 @@ import { EntityManager } from 'typeorm/entity-manager/EntityManager'
 import {
     QueryRunner, ObjectType, EntitySchema, ObjectID,
     FindOneOptions, ObjectLiteral, FindOptionsUtils,
-    FindManyOptions, QueryBuilder
+    FindManyOptions
 } from 'typeorm'
 import { NgerConnection } from './Connection';
 import { Injector, getCurrentInjector } from '@nger/core';
@@ -13,7 +13,6 @@ import { RepositoryNotTreeError } from 'typeorm/error/RepositoryNotTreeError'
 import { NgerRepositoryFactory } from './RepositoryFactory';
 import { NgerTreeRepository } from './TreeRepository';
 import { NgerMongoRepository } from './MongoRepository';
-import { TYPEORM_HOOK } from './token';
 export class NgerEntityManager extends EntityManager {
     injector: Injector;
     readonly connection: NgerConnection;
@@ -27,7 +26,6 @@ export class NgerEntityManager extends EntityManager {
         const metadata = this.connection.getMetadata(entityClass);
         const qb = this.createQueryBuilder(entityClass as any, FindOptionsUtils.extractFindManyOptionsAlias(optionsOrConditions) || metadata.name);
         FindOptionsUtils.applyFindManyOptionsOrConditionsToQueryBuilder(qb, optionsOrConditions);
-        this.beforeQuery(qb);
         return qb.getCount();
     }
     async find<Entity>(entityClass: ObjectType<Entity> | EntitySchema<Entity> | string, optionsOrConditions?: FindManyOptions<Entity> | any): Promise<Entity[]> {
@@ -36,7 +34,6 @@ export class NgerEntityManager extends EntityManager {
         if (!FindOptionsUtils.isFindManyOptions(optionsOrConditions) || optionsOrConditions.loadEagerRelations !== false)
             FindOptionsUtils.joinEagerRelations(qb, qb.alias, metadata);
         FindOptionsUtils.applyFindManyOptionsOrConditionsToQueryBuilder(qb, optionsOrConditions);
-        this.beforeQuery(qb);
         return qb.getMany();
     }
     async findAndCount<Entity>(entityClass: ObjectType<Entity> | EntitySchema<Entity> | string, optionsOrConditions?: FindManyOptions<Entity> | any): Promise<[Entity[], number]> {
@@ -45,7 +42,6 @@ export class NgerEntityManager extends EntityManager {
         if (!FindOptionsUtils.isFindManyOptions(optionsOrConditions) || optionsOrConditions.loadEagerRelations !== false)
             FindOptionsUtils.joinEagerRelations(qb, qb.alias, metadata);
         FindOptionsUtils.applyFindManyOptionsOrConditionsToQueryBuilder(qb, optionsOrConditions)
-        this.beforeQuery(qb);
         return qb.getManyAndCount();
     }
     async findByIds<Entity>(entityClass: ObjectType<Entity> | EntitySchema<Entity> | string, ids: any[], optionsOrConditions?: FindManyOptions<Entity> | any): Promise<Entity[]> {
@@ -57,7 +53,6 @@ export class NgerEntityManager extends EntityManager {
         if (!FindOptionsUtils.isFindManyOptions(optionsOrConditions) || optionsOrConditions.loadEagerRelations !== false)
             FindOptionsUtils.joinEagerRelations(qb, qb.alias, metadata);
         qb.andWhereInIds(ids)
-        this.beforeQuery(qb)
         return qb.getMany();
     }
     async findOne<Entity>(entityClass: ObjectType<Entity> | EntitySchema<Entity> | string, idOrOptionsOrConditions?: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindOneOptions<Entity> | any, maybeOptions?: FindOneOptions<Entity>): Promise<Entity | undefined> {
@@ -91,7 +86,6 @@ export class NgerEntityManager extends EntityManager {
         } else if (typeof idOrOptionsOrConditions === "string" || typeof idOrOptionsOrConditions === "number" || (idOrOptionsOrConditions as any) instanceof Date) {
             qb.andWhereInIds(metadata.ensureEntityIdMap(idOrOptionsOrConditions));
         }
-        this.beforeQuery(qb);
         return qb.getOne();
     }
 
@@ -121,12 +115,5 @@ export class NgerEntityManager extends EntityManager {
     }
     getMongoRepository<Entity>(target: ObjectType<Entity> | EntitySchema<Entity> | string): NgerMongoRepository<Entity> {
         return this.connection.getMongoRepository<Entity>(target);
-    }
-    private beforeQuery(qb: QueryBuilder<any>) {
-        const injector = getCurrentInjector() || this.injector || (qb.connection as NgerConnection).injector;
-        if (injector) {
-            const hooks = injector.get(TYPEORM_HOOK, []);
-            hooks.map(hook => hook.before(qb))
-        }
     }
 }
