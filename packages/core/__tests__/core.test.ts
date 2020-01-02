@@ -1,15 +1,34 @@
-import { corePlatform, Module } from '@nger/core'
-import { TypeormModule } from '../lib'
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm'
+import { corePlatform, Module, } from '@nger/core'
+import { TypeormModule, TypeormHook } from '../lib'
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Connection, QueryBuilder, Repository, ManyToMany } from 'typeorm'
+export class DefaultTypeormHook<T> extends TypeormHook<T>{
+    before(qb: QueryBuilder<T>): void {
+        console.log(qb, qb.alias)
+    }
+}
 @Entity({
     name: `meepo_demo_user`
 })
-export class DemoUser extends BaseEntity {
+export class DemoUser {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    name: string;
+    name: string = `demo user name`;
+}
+
+@Entity({
+    name: `meepo_demo_user2`
+})
+export class DemoUser2 {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({
+        default: `demo user name`,
+        nullable: true
+    })
+    name: string = `demo user name`;
 }
 @Module({
     imports: [
@@ -23,12 +42,16 @@ export class DemoUser extends BaseEntity {
             database: `zp`,
             entities: [],
             synchronize: true
-        }),
-        TypeormModule.forFeature([DemoUser]),
+        }, DefaultTypeormHook),
+        TypeormModule.forFeature([DemoUser, DemoUser2]),
     ]
 })
 export class AppModule { }
 corePlatform().bootstrapModule(AppModule).then(async res => {
-    let demoUser = res.get(DemoUser)
+    let demoUser = res.get<Repository<DemoUser>>(DemoUser as any)
+    const user = new DemoUser();
+    user.name = `user1`;
+    await demoUser.save(user)
+    let userList = await demoUser.find({})
     debugger;
 })
