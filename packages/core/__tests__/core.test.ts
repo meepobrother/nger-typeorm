@@ -1,6 +1,6 @@
-import { corePlatform, Module, } from '@nger/core'
+import { corePlatform, Module, getCurrentInjector } from '@nger/core'
 import { TypeormModule, TypeormHook } from '../lib'
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Connection, QueryBuilder, Repository, ManyToMany } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, QueryBuilder, Repository } from 'typeorm'
 export class DefaultTypeormHook<T> extends TypeormHook<T>{
     before(qb: QueryBuilder<T>): void {
         console.log(qb, qb.alias)
@@ -49,6 +49,7 @@ export class DemoUser2 {
 export class AppModule { }
 corePlatform().bootstrapModule(AppModule).then(async res => {
     let demoUser = res.get<Repository<DemoUser>>(DemoUser as any)
+    const injector = getCurrentInjector()
     const user = new DemoUser();
     user.name = `user1`;
     await demoUser.save(user)

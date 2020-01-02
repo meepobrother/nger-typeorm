@@ -88,7 +88,6 @@ export class NgerEntityManager extends EntityManager {
         FindOptionsUtils.applyOptionsToQueryBuilder(qb, findOptions);
         if (options) {
             qb.where(options);
-
         } else if (typeof idOrOptionsOrConditions === "string" || typeof idOrOptionsOrConditions === "number" || (idOrOptionsOrConditions as any) instanceof Date) {
             qb.andWhereInIds(metadata.ensureEntityIdMap(idOrOptionsOrConditions));
         }
@@ -124,10 +123,9 @@ export class NgerEntityManager extends EntityManager {
         return this.connection.getMongoRepository<Entity>(target);
     }
     private beforeQuery(qb: QueryBuilder<any>) {
-        const injector = (qb.connection as NgerConnection).injector
-        this.injector = this.injector || getCurrentInjector() || injector;
-        if (this.injector) {
-            const hooks = this.injector.get(TYPEORM_HOOK, []);
+        const injector = getCurrentInjector() || this.injector || (qb.connection as NgerConnection).injector;
+        if (injector) {
+            const hooks = injector.get(TYPEORM_HOOK, []);
             hooks.map(hook => hook.before(qb))
         }
     }

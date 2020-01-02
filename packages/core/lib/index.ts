@@ -1,4 +1,4 @@
-import { Module, ModuleWithProviders, InjectionToken, Injector, Type, APP_INITIALIZER, StaticProvider } from '@nger/core'
+import { Module, ModuleWithProviders, InjectionToken, Injector, Type, APP_INITIALIZER, StaticProvider, getCurrentInjector } from '@nger/core'
 import {
     getConnection, Connection,
     ConnectionManager, getConnectionManager,
