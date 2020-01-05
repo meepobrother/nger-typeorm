@@ -1,7 +1,7 @@
 import { Module, ModuleWithProviders, InjectionToken, Injector, Type, APP_INITIALIZER, StaticProvider, getCurrentInjector } from '@nger/core'
 import {
     getConnection, Connection,
-    ConnectionManager, getConnectionManager,
+    ConnectionManager,
     ConnectionOptions, EntityManager, getMetadataArgsStorage,
     getManager, useContainer
 } from 'typeorm';
@@ -110,3 +110,4 @@ export class TypeormModule {
 }
 
 export * from './token';
+export * from './SelectQueryBuilder'

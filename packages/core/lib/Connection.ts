@@ -20,7 +20,6 @@ export class NgerConnection extends Connection {
     createEntityManager(queryRunner?: QueryRunner): EntityManager {
         return new NgerEntityManagerFactory().create(this, queryRunner);
     }
-
     createQueryBuilder<Entity>(entityOrRunner?: ObjectType<Entity> | EntitySchema<Entity> | Function | string | QueryRunner, alias?: string, queryRunner?: QueryRunner): NgerSelectQueryBuilder<Entity> {
         if (this instanceof MongoEntityManager)
             throw new Error(`Query Builder is not supported by MongoDB.`);
@@ -28,7 +27,7 @@ export class NgerConnection extends Connection {
             const metadata = this.getMetadata(entityOrRunner as Function | EntitySchema<Entity> | string);
             return new NgerSelectQueryBuilder(this, queryRunner)
                 .select(alias)
-                .from(metadata.target, alias);
+                .from(metadata.target, alias) as any;
         } else {
             return new NgerSelectQueryBuilder(this, entityOrRunner as QueryRunner | undefined);
         }
