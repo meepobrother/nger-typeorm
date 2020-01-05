@@ -1,6 +1,6 @@
 {
   "name": "@nger/typeorm",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "> TODO: description",
   "author": "imeepos <admin@meepo.com.cn>",
   "homepage": "https://github.com/meepobrother/nger-typeorm#readme",
@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "@nger/core": "^1.9.21",
-    "typeorm": "^0.2.22"
+    "@nger/typeorm-native": "^0.0.4"
   }
 }

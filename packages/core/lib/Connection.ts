@@ -1,8 +1,7 @@
-import { Connection, ConnectionOptions, QueryRunner, EntityManager, ObjectType, EntitySchema, MongoEntityManager } from 'typeorm'
+import { Connection, MongoDriver, ConnectionOptions, QueryRunner, EntityManager, ObjectType, EntitySchema, MongoEntityManager } from '@nger/typeorm-native'
 import { Injector, getCurrentInjector } from '@nger/core';
 import { NgerEntityManagerFactory } from './EntityManagerFactory';
 import { NgerMongoRepository } from './MongoRepository';
-import { MongoDriver } from 'typeorm/driver/mongodb/MongoDriver';
 import { NgerEntityManager } from './EntityManager';
 import { NgerSelectQueryBuilder } from './SelectQueryBuilder';
 export class NgerConnection extends Connection {

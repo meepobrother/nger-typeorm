@@ -1,9 +1,9 @@
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {QueryRunnerAlreadyReleasedError} from "../../error/QueryRunnerAlreadyReleasedError";
-import {QueryFailedError} from "../../error/QueryFailedError";
-import {AbstractSqliteQueryRunner} from "../sqlite-abstract/AbstractSqliteQueryRunner";
-import {NativescriptDriver} from "./NativescriptDriver";
-import {Broadcaster} from "../../subscriber/Broadcaster";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { QueryRunnerAlreadyReleasedError } from "../../error/QueryRunnerAlreadyReleasedError";
+import { QueryFailedError } from "../../error/QueryFailedError";
+import { AbstractSqliteQueryRunner } from "../sqlite-abstract/AbstractSqliteQueryRunner";
+import { NativescriptDriver } from "./NativescriptDriver";
+import { Broadcaster } from "../../subscriber/Broadcaster";
 
 /**
  * Runs queries on a single sqlite database connection.
@@ -35,7 +35,7 @@ export class NativescriptQueryRunner extends AbstractSqliteQueryRunner {
 
         const connection = this.driver.connection;
 
-        return new Promise<any[]>( (ok, fail) => {
+        return new Promise<any[]>((ok, fail) => {
             const isInsertQuery = query.substr(0, 11) === "INSERT INTO";
 
             const handler = function (err: any, result: any) {

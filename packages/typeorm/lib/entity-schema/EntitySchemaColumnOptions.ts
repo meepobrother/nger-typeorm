@@ -1,4 +1,4 @@
-import { ColumnType } from "../driver/types/ColumnTypes";
+import { ColumnType } from "../driver/driver-types/ColumnTypes";
 import { ValueTransformer } from "../decorator/options/ValueTransformer";
 import { SpatialColumnOptions } from "../decorator/options/SpatialColumnOptions";
 

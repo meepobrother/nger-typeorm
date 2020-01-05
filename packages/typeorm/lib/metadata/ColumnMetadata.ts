@@ -1,4 +1,4 @@
-import { ColumnType } from "../driver/types/ColumnTypes";
+import { ColumnType } from "../driver/driver-types/ColumnTypes";
 import { EntityMetadata } from "./EntityMetadata";
 import { EmbeddedMetadata } from "./EmbeddedMetadata";
 import { RelationMetadata } from "./RelationMetadata";

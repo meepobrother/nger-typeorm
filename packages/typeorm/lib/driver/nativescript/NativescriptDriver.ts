@@ -1,11 +1,11 @@
-import {AbstractSqliteDriver} from "../sqlite-abstract/AbstractSqliteDriver";
-import {NativescriptConnectionOptions} from "./NativescriptConnectionOptions";
-import {NativescriptQueryRunner} from "./NativescriptQueryRunner";
-import {QueryRunner} from "../../query-runner/QueryRunner";
-import {Connection} from "../../connection/Connection";
-import {DriverOptionNotSetError} from "../../error/DriverOptionNotSetError";
-import {DriverPackageNotInstalledError} from "../../error/DriverPackageNotInstalledError";
-import {ColumnType} from "../types/ColumnTypes";
+import { AbstractSqliteDriver } from "../sqlite-abstract/AbstractSqliteDriver";
+import { NativescriptConnectionOptions } from "./NativescriptConnectionOptions";
+import { NativescriptQueryRunner } from "./NativescriptQueryRunner";
+import { QueryRunner } from "../../query-runner/QueryRunner";
+import { Connection } from "../../connection/Connection";
+import { DriverOptionNotSetError } from "../../error/DriverOptionNotSetError";
+import { DriverPackageNotInstalledError } from "../../error/DriverPackageNotInstalledError";
+import { ColumnType } from "../driver-types/ColumnTypes";
 
 /**
  * Organizes communication with sqlite DBMS within Nativescript.
@@ -66,7 +66,7 @@ export class NativescriptDriver extends AbstractSqliteDriver {
     /**
      * Creates a query runner used to execute database queries.
      */
-    createQueryRunner(mode: "master"|"slave" = "master"): QueryRunner {
+    createQueryRunner(mode: "master" | "slave" = "master"): QueryRunner {
         if (!this.queryRunner) {
             this.queryRunner = new NativescriptQueryRunner(this);
         }
@@ -74,7 +74,7 @@ export class NativescriptDriver extends AbstractSqliteDriver {
         return this.queryRunner;
     }
 
-    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number|null, scale?: number }): string {
+    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number | null, scale?: number }): string {
         if ((column.type as any) === Buffer) {
             return "blob";
         }

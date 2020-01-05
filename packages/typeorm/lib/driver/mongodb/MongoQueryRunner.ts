@@ -4,7 +4,7 @@ import { TableColumn } from "../../schema-builder/table/TableColumn";
 import { Table } from "../../schema-builder/table/Table";
 import { TableForeignKey } from "../../schema-builder/table/TableForeignKey";
 import { TableIndex } from "../../schema-builder/table/TableIndex";
-import {View} from "../../schema-builder/view/View";
+import { View } from "../../schema-builder/view/View";
 import {
     AggregationCursor,
     BulkWriteOpResultObject,
@@ -586,7 +586,7 @@ export class MongoQueryRunner implements QueryRunner {
     /**
      * Drops the view.
      */
-    async dropView(target: View|string): Promise<void> {
+    async dropView(target: View | string): Promise<void> {
         throw new Error(`Schema update queries are not supported by MongoDB driver.`);
     }
 

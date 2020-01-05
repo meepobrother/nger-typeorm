@@ -1,21 +1,21 @@
-import {Driver} from "../Driver";
-import {DriverUtils} from "../DriverUtils";
-import {AuroraDataApiQueryRunner} from "./AuroraDataApiQueryRunner";
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {ColumnMetadata} from "../../metadata/ColumnMetadata";
-import {DateUtils} from "../../util/DateUtils";
-import {PlatformTools} from "../../platform/PlatformTools";
-import {Connection} from "../../connection/Connection";
-import {RdbmsSchemaBuilder} from "../../schema-builder/RdbmsSchemaBuilder";
-import {AuroraDataApiConnectionOptions} from "./AuroraDataApiConnectionOptions";
-import {MappedColumnTypes} from "../types/MappedColumnTypes";
-import {ColumnType} from "../types/ColumnTypes";
-import {DataTypeDefaults} from "../types/DataTypeDefaults";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {AuroraDataApiConnectionCredentialsOptions} from "./AuroraDataApiConnectionCredentialsOptions";
-import {EntityMetadata} from "../../metadata/EntityMetadata";
-import {OrmUtils} from "../../util/OrmUtils";
-import {ApplyValueTransformers} from "../../util/ApplyValueTransformers";
+import { Driver } from "../Driver";
+import { DriverUtils } from "../DriverUtils";
+import { AuroraDataApiQueryRunner } from "./AuroraDataApiQueryRunner";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { ColumnMetadata } from "../../metadata/ColumnMetadata";
+import { DateUtils } from "../../util/DateUtils";
+import { PlatformTools } from "../../platform/PlatformTools";
+import { Connection } from "../../connection/Connection";
+import { RdbmsSchemaBuilder } from "../../schema-builder/RdbmsSchemaBuilder";
+import { AuroraDataApiConnectionOptions } from "./AuroraDataApiConnectionOptions";
+import { MappedColumnTypes } from "../driver-types/MappedColumnTypes";
+import { ColumnType } from "../driver-types/ColumnTypes";
+import { DataTypeDefaults } from "../driver-types/DataTypeDefaults";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { AuroraDataApiConnectionCredentialsOptions } from "./AuroraDataApiConnectionCredentialsOptions";
+import { EntityMetadata } from "../../metadata/EntityMetadata";
+import { OrmUtils } from "../../util/OrmUtils";
+import { ApplyValueTransformers } from "../../util/ApplyValueTransformers";
 
 /**
  * Organizes communication with MySQL DBMS.
@@ -350,7 +350,7 @@ export class AuroraDataApiDriver implements Driver {
     /**
      * Creates a query runner used to execute database queries.
      */
-    createQueryRunner(mode: "master"|"slave" = "master") {
+    createQueryRunner(mode: "master" | "slave" = "master") {
         return new AuroraDataApiQueryRunner(this);
     }
 
@@ -481,7 +481,7 @@ export class AuroraDataApiDriver implements Driver {
     /**
      * Creates a database type from a given column metadata.
      */
-    normalizeType(column: { type: ColumnType, length?: number|string, precision?: number|null, scale?: number }): string {
+    normalizeType(column: { type: ColumnType, length?: number | string, precision?: number | null, scale?: number }): string {
         if (column.type === Number || column.type === "integer") {
             return "int";
 
@@ -566,7 +566,7 @@ export class AuroraDataApiDriver implements Driver {
     /**
      * Returns default column lengths, which is required on column creation.
      */
-    getColumnLength(column: ColumnMetadata|TableColumn): string {
+    getColumnLength(column: ColumnMetadata | TableColumn): string {
         if (column.length)
             return column.length.toString();
 
@@ -661,9 +661,9 @@ export class AuroraDataApiDriver implements Driver {
             let value: any;
             if (generatedColumn.generationStrategy === "increment" && insertResult.insertId) {
                 value = insertResult.insertId;
-            // } else if (generatedColumn.generationStrategy === "uuid") {
-            //     console.log("getting db value:", generatedColumn.databaseName);
-            //     value = generatedColumn.getEntityValue(uuidMap);
+                // } else if (generatedColumn.generationStrategy === "uuid") {
+                //     console.log("getting db value:", generatedColumn.databaseName);
+                //     value = generatedColumn.getEntityValue(uuidMap);
             }
 
             return OrmUtils.mergeDeep(map, generatedColumn.createValueMap(value));
@@ -786,7 +786,7 @@ export class AuroraDataApiDriver implements Driver {
             ssl: options.ssl
         },
 
-        options.extra || {});
+            options.extra || {});
     }
 
     /**

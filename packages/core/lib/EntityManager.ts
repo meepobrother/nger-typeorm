@@ -1,15 +1,12 @@
-import { EntityManager } from 'typeorm/entity-manager/EntityManager'
 import {
     QueryRunner, ObjectType, EntitySchema, ObjectID,
     FindOneOptions, ObjectLiteral, FindOptionsUtils,
-    FindManyOptions
-} from 'typeorm'
+    FindManyOptions, RepositoryNotFoundError, EntityManager,
+    TreeRepositoryNotSupportedError, RepositoryNotTreeError
+} from '@nger/typeorm-native'
 import { NgerConnection } from './Connection';
 import { Injector, getCurrentInjector } from '@nger/core';
 import { NgerRepository } from './Repository';
-import { RepositoryNotFoundError } from 'typeorm/error/RepositoryNotFoundError'
-import { TreeRepositoryNotSupportedError } from 'typeorm/error/TreeRepositoryNotSupportedError'
-import { RepositoryNotTreeError } from 'typeorm/error/RepositoryNotTreeError'
 import { NgerRepositoryFactory } from './RepositoryFactory';
 import { NgerTreeRepository } from './TreeRepository';
 import { NgerMongoRepository } from './MongoRepository';

@@ -1,10 +1,10 @@
-import {QueryRunnerAlreadyReleasedError} from "../../error/QueryRunnerAlreadyReleasedError";
-import {QueryFailedError} from "../../error/QueryFailedError";
-import {AbstractSqliteQueryRunner} from "../sqlite-abstract/AbstractSqliteQueryRunner";
-import {TransactionAlreadyStartedError} from "../../error/TransactionAlreadyStartedError";
-import {TransactionNotStartedError} from "../../error/TransactionNotStartedError";
-import {ExpoDriver} from "./ExpoDriver";
-import {Broadcaster} from "../../subscriber/Broadcaster";
+import { QueryRunnerAlreadyReleasedError } from "../../error/QueryRunnerAlreadyReleasedError";
+import { QueryFailedError } from "../../error/QueryFailedError";
+import { AbstractSqliteQueryRunner } from "../sqlite-abstract/AbstractSqliteQueryRunner";
+import { TransactionAlreadyStartedError } from "../../error/TransactionAlreadyStartedError";
+import { TransactionNotStartedError } from "../../error/TransactionNotStartedError";
+import { ExpoDriver } from "./ExpoDriver";
+import { Broadcaster } from "../../subscriber/Broadcaster";
 
 // Needed to satisfy the Typescript compiler
 interface IResultSet {
@@ -29,7 +29,7 @@ interface ITransaction {
  * Runs queries on a single sqlite database connection.
  */
 export class ExpoQueryRunner extends AbstractSqliteQueryRunner {
-    
+
     /**
      * Database driver used by connection.
      */
@@ -39,7 +39,7 @@ export class ExpoQueryRunner extends AbstractSqliteQueryRunner {
      * Database transaction object
      */
     private transaction?: ITransaction;
-    
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -125,7 +125,7 @@ export class ExpoQueryRunner extends AbstractSqliteQueryRunner {
                     if (maxQueryExecutionTime && queryExecutionTime > maxQueryExecutionTime) {
                         this.driver.connection.logger.logQuerySlow(queryExecutionTime, query, parameters, this);
                     }
-    
+
                     // return id of inserted row, if query was insert statement.
                     if (query.substr(0, 11) === "INSERT INTO") {
                         ok(result.insertId);

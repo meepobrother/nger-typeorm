@@ -1,23 +1,23 @@
-import {QueryRunner} from "../../query-runner/QueryRunner";
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {TransactionAlreadyStartedError} from "../../error/TransactionAlreadyStartedError";
-import {TransactionNotStartedError} from "../../error/TransactionNotStartedError";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {ColumnMetadata} from "../../metadata/ColumnMetadata";
-import {Table} from "../../schema-builder/table/Table";
-import {TableIndex} from "../../schema-builder/table/TableIndex";
-import {TableForeignKey} from "../../schema-builder/table/TableForeignKey";
-import {View} from "../../schema-builder/view/View";
-import {Query} from "../Query";
-import {AbstractSqliteDriver} from "./AbstractSqliteDriver";
-import {ReadStream} from "../../platform/PlatformTools";
-import {TableIndexOptions} from "../../schema-builder/options/TableIndexOptions";
-import {TableUnique} from "../../schema-builder/table/TableUnique";
-import {BaseQueryRunner} from "../../query-runner/BaseQueryRunner";
-import {OrmUtils} from "../../util/OrmUtils";
-import {TableCheck} from "../../schema-builder/table/TableCheck";
-import {IsolationLevel} from "../types/IsolationLevel";
-import {TableExclusion} from "../../schema-builder/table/TableExclusion";
+import { QueryRunner } from "../../query-runner/QueryRunner";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { TransactionAlreadyStartedError } from "../../error/TransactionAlreadyStartedError";
+import { TransactionNotStartedError } from "../../error/TransactionNotStartedError";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { ColumnMetadata } from "../../metadata/ColumnMetadata";
+import { Table } from "../../schema-builder/table/Table";
+import { TableIndex } from "../../schema-builder/table/TableIndex";
+import { TableForeignKey } from "../../schema-builder/table/TableForeignKey";
+import { View } from "../../schema-builder/view/View";
+import { Query } from "../Query";
+import { AbstractSqliteDriver } from "./AbstractSqliteDriver";
+import { ReadStream } from "../../platform/PlatformTools";
+import { TableIndexOptions } from "../../schema-builder/options/TableIndexOptions";
+import { TableUnique } from "../../schema-builder/table/TableUnique";
+import { BaseQueryRunner } from "../../query-runner/BaseQueryRunner";
+import { OrmUtils } from "../../util/OrmUtils";
+import { TableCheck } from "../../schema-builder/table/TableCheck";
+import { IsolationLevel } from "../driver-types/IsolationLevel";
+import { TableExclusion } from "../../schema-builder/table/TableExclusion";
 
 /**
  * Runs queries on a single sqlite database connection.
@@ -150,7 +150,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Checks if table with the given name exist in the database.
      */
-    async hasTable(tableOrName: Table|string): Promise<boolean> {
+    async hasTable(tableOrName: Table | string): Promise<boolean> {
         const tableName = tableOrName instanceof Table ? tableOrName.name : tableOrName;
         const sql = `SELECT * FROM "sqlite_master" WHERE "type" = 'table' AND "name" = '${tableName}'`;
         const result = await this.query(sql);
@@ -160,7 +160,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Checks if column with the given name exist in the given table.
      */
-    async hasColumn(tableOrName: Table|string, columnName: string): Promise<boolean> {
+    async hasColumn(tableOrName: Table | string, columnName: string): Promise<boolean> {
         const tableName = tableOrName instanceof Table ? tableOrName.name : tableOrName;
         const sql = `PRAGMA table_info("${tableName}")`;
         const columns: ObjectLiteral[] = await this.query(sql);
@@ -227,7 +227,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops the table.
      */
-    async dropTable(tableOrName: Table|string, ifExist?: boolean, dropForeignKeys: boolean = true, dropIndices: boolean = true): Promise<void> {
+    async dropTable(tableOrName: Table | string, ifExist?: boolean, dropForeignKeys: boolean = true, dropIndices: boolean = true): Promise<void> {
         if (ifExist) {
             const isTableExist = await this.hasTable(tableOrName);
             if (!isTableExist) return Promise.resolve();
@@ -268,7 +268,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops the view.
      */
-    async dropView(target: View|string): Promise<void> {
+    async dropView(target: View | string): Promise<void> {
         const viewName = target instanceof View ? target.name : target;
         const view = await this.getCachedView(viewName);
 
@@ -284,7 +284,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Renames the given table.
      */
-    async renameTable(oldTableOrName: Table|string, newTableName: string): Promise<void> {
+    async renameTable(oldTableOrName: Table | string, newTableName: string): Promise<void> {
         const oldTable = oldTableOrName instanceof Table ? oldTableOrName : await this.getCachedTable(oldTableOrName);
         const newTable = oldTable.clone();
         newTable.name = newTableName;
@@ -319,7 +319,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates a new column from the column in the table.
      */
-    async addColumn(tableOrName: Table|string, column: TableColumn): Promise<void> {
+    async addColumn(tableOrName: Table | string, column: TableColumn): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         return this.addColumns(table!, [column]);
     }
@@ -327,7 +327,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates a new columns from the column in the table.
      */
-    async addColumns(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async addColumns(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const changedTable = table.clone();
         columns.forEach(column => changedTable.addColumn(column));
@@ -337,13 +337,13 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Renames column in the given table.
      */
-    async renameColumn(tableOrName: Table|string, oldTableColumnOrName: TableColumn|string, newTableColumnOrName: TableColumn|string): Promise<void> {
+    async renameColumn(tableOrName: Table | string, oldTableColumnOrName: TableColumn | string, newTableColumnOrName: TableColumn | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const oldColumn = oldTableColumnOrName instanceof TableColumn ? oldTableColumnOrName : table.columns.find(c => c.name === oldTableColumnOrName);
         if (!oldColumn)
             throw new Error(`Column "${oldTableColumnOrName}" was not found in the "${table.name}" table.`);
 
-        let newColumn: TableColumn|undefined = undefined;
+        let newColumn: TableColumn | undefined = undefined;
         if (newTableColumnOrName instanceof TableColumn) {
             newColumn = newTableColumnOrName;
         } else {
@@ -357,20 +357,20 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Changes a column in the table.
      */
-    async changeColumn(tableOrName: Table|string, oldTableColumnOrName: TableColumn|string, newColumn: TableColumn): Promise<void> {
+    async changeColumn(tableOrName: Table | string, oldTableColumnOrName: TableColumn | string, newColumn: TableColumn): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const oldColumn = oldTableColumnOrName instanceof TableColumn ? oldTableColumnOrName : table.columns.find(c => c.name === oldTableColumnOrName);
         if (!oldColumn)
             throw new Error(`Column "${oldTableColumnOrName}" was not found in the "${table.name}" table.`);
 
-        await this.changeColumns(table, [{oldColumn, newColumn}]);
+        await this.changeColumns(table, [{ oldColumn, newColumn }]);
     }
 
     /**
      * Changes a column in the table.
      * Changed column looses all its keys in the db.
      */
-    async changeColumns(tableOrName: Table|string, changedColumns: { oldColumn: TableColumn, newColumn: TableColumn }[]): Promise<void> {
+    async changeColumns(tableOrName: Table | string, changedColumns: { oldColumn: TableColumn, newColumn: TableColumn }[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const changedTable = table.clone();
         changedColumns.forEach(changedColumnSet => {
@@ -404,7 +404,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops column in the table.
      */
-    async dropColumn(tableOrName: Table|string, columnOrName: TableColumn|string): Promise<void> {
+    async dropColumn(tableOrName: Table | string, columnOrName: TableColumn | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const column = columnOrName instanceof TableColumn ? columnOrName : table.findColumnByName(columnOrName);
         if (!column)
@@ -416,7 +416,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops the columns in the table.
      */
-    async dropColumns(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async dropColumns(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // clone original table and remove column and its constraints from cloned table
@@ -442,7 +442,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates a new primary key.
      */
-    async createPrimaryKey(tableOrName: Table|string, columnNames: string[]): Promise<void> {
+    async createPrimaryKey(tableOrName: Table | string, columnNames: string[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         // clone original table and mark columns as primary
         const changedTable = table.clone();
@@ -462,14 +462,14 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Updates composite primary keys.
      */
-    async updatePrimaryKeys(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async updatePrimaryKeys(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         await Promise.resolve();
     }
 
     /**
      * Drops a primary key.
      */
-    async dropPrimaryKey(tableOrName: Table|string): Promise<void> {
+    async dropPrimaryKey(tableOrName: Table | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         // clone original table and mark primary columns as non-primary
         const changedTable = table.clone();
@@ -487,14 +487,14 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates a new unique constraint.
      */
-    async createUniqueConstraint(tableOrName: Table|string, uniqueConstraint: TableUnique): Promise<void> {
+    async createUniqueConstraint(tableOrName: Table | string, uniqueConstraint: TableUnique): Promise<void> {
         await this.createUniqueConstraints(tableOrName, [uniqueConstraint]);
     }
 
     /**
      * Creates a new unique constraints.
      */
-    async createUniqueConstraints(tableOrName: Table|string, uniqueConstraints: TableUnique[]): Promise<void> {
+    async createUniqueConstraints(tableOrName: Table | string, uniqueConstraints: TableUnique[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // clone original table and add unique constraints in to cloned table
@@ -506,7 +506,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops an unique constraint.
      */
-    async dropUniqueConstraint(tableOrName: Table|string, uniqueOrName: TableUnique|string): Promise<void> {
+    async dropUniqueConstraint(tableOrName: Table | string, uniqueOrName: TableUnique | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const uniqueConstraint = uniqueOrName instanceof TableUnique ? uniqueOrName : table.uniques.find(u => u.name === uniqueOrName);
         if (!uniqueConstraint)
@@ -518,7 +518,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates an unique constraints.
      */
-    async dropUniqueConstraints(tableOrName: Table|string, uniqueConstraints: TableUnique[]): Promise<void> {
+    async dropUniqueConstraints(tableOrName: Table | string, uniqueConstraints: TableUnique[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // clone original table and remove unique constraints from cloned table
@@ -531,14 +531,14 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates new check constraint.
      */
-    async createCheckConstraint(tableOrName: Table|string, checkConstraint: TableCheck): Promise<void> {
+    async createCheckConstraint(tableOrName: Table | string, checkConstraint: TableCheck): Promise<void> {
         await this.createCheckConstraints(tableOrName, [checkConstraint]);
     }
 
     /**
      * Creates new check constraints.
      */
-    async createCheckConstraints(tableOrName: Table|string, checkConstraints: TableCheck[]): Promise<void> {
+    async createCheckConstraints(tableOrName: Table | string, checkConstraints: TableCheck[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // clone original table and add check constraints in to cloned table
@@ -550,7 +550,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops check constraint.
      */
-    async dropCheckConstraint(tableOrName: Table|string, checkOrName: TableCheck|string): Promise<void> {
+    async dropCheckConstraint(tableOrName: Table | string, checkOrName: TableCheck | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const checkConstraint = checkOrName instanceof TableCheck ? checkOrName : table.checks.find(c => c.name === checkOrName);
         if (!checkConstraint)
@@ -562,7 +562,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops check constraints.
      */
-    async dropCheckConstraints(tableOrName: Table|string, checkConstraints: TableCheck[]): Promise<void> {
+    async dropCheckConstraints(tableOrName: Table | string, checkConstraints: TableCheck[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // clone original table and remove check constraints from cloned table
@@ -575,42 +575,42 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates a new exclusion constraint.
      */
-    async createExclusionConstraint(tableOrName: Table|string, exclusionConstraint: TableExclusion): Promise<void> {
+    async createExclusionConstraint(tableOrName: Table | string, exclusionConstraint: TableExclusion): Promise<void> {
         throw new Error(`Sqlite does not support exclusion constraints.`);
     }
 
     /**
      * Creates a new exclusion constraints.
      */
-    async createExclusionConstraints(tableOrName: Table|string, exclusionConstraints: TableExclusion[]): Promise<void> {
+    async createExclusionConstraints(tableOrName: Table | string, exclusionConstraints: TableExclusion[]): Promise<void> {
         throw new Error(`Sqlite does not support exclusion constraints.`);
     }
 
     /**
      * Drops exclusion constraint.
      */
-    async dropExclusionConstraint(tableOrName: Table|string, exclusionOrName: TableExclusion|string): Promise<void> {
+    async dropExclusionConstraint(tableOrName: Table | string, exclusionOrName: TableExclusion | string): Promise<void> {
         throw new Error(`Sqlite does not support exclusion constraints.`);
     }
 
     /**
      * Drops exclusion constraints.
      */
-    async dropExclusionConstraints(tableOrName: Table|string, exclusionConstraints: TableExclusion[]): Promise<void> {
+    async dropExclusionConstraints(tableOrName: Table | string, exclusionConstraints: TableExclusion[]): Promise<void> {
         throw new Error(`Sqlite does not support exclusion constraints.`);
     }
 
     /**
      * Creates a new foreign key.
      */
-    async createForeignKey(tableOrName: Table|string, foreignKey: TableForeignKey): Promise<void> {
+    async createForeignKey(tableOrName: Table | string, foreignKey: TableForeignKey): Promise<void> {
         await this.createForeignKeys(tableOrName, [foreignKey]);
     }
 
     /**
      * Creates a new foreign keys.
      */
-    async createForeignKeys(tableOrName: Table|string, foreignKeys: TableForeignKey[]): Promise<void> {
+    async createForeignKeys(tableOrName: Table | string, foreignKeys: TableForeignKey[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         // clone original table and add foreign keys in to cloned table
         const changedTable = table.clone();
@@ -622,7 +622,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops a foreign key from the table.
      */
-    async dropForeignKey(tableOrName: Table|string, foreignKeyOrName: TableForeignKey|string): Promise<void> {
+    async dropForeignKey(tableOrName: Table | string, foreignKeyOrName: TableForeignKey | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const foreignKey = foreignKeyOrName instanceof TableForeignKey ? foreignKeyOrName : table.foreignKeys.find(fk => fk.name === foreignKeyOrName);
         if (!foreignKey)
@@ -634,7 +634,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops a foreign keys from the table.
      */
-    async dropForeignKeys(tableOrName: Table|string, foreignKeys: TableForeignKey[]): Promise<void> {
+    async dropForeignKeys(tableOrName: Table | string, foreignKeys: TableForeignKey[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // clone original table and remove foreign keys from cloned table
@@ -647,7 +647,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates a new index.
      */
-    async createIndex(tableOrName: Table|string, index: TableIndex): Promise<void> {
+    async createIndex(tableOrName: Table | string, index: TableIndex): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new index may be passed without name. In this case we generate index name manually.
@@ -663,7 +663,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Creates a new indices
      */
-    async createIndices(tableOrName: Table|string, indices: TableIndex[]): Promise<void> {
+    async createIndices(tableOrName: Table | string, indices: TableIndex[]): Promise<void> {
         const promises = indices.map(index => this.createIndex(tableOrName, index));
         await Promise.all(promises);
     }
@@ -671,7 +671,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops an index from the table.
      */
-    async dropIndex(tableOrName: Table|string, indexOrName: TableIndex|string): Promise<void> {
+    async dropIndex(tableOrName: Table | string, indexOrName: TableIndex | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const index = indexOrName instanceof TableIndex ? indexOrName : table.indices.find(i => i.name === indexOrName);
         if (!index)
@@ -686,7 +686,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Drops an indices from the table.
      */
-    async dropIndices(tableOrName: Table|string, indices: TableIndex[]): Promise<void> {
+    async dropIndices(tableOrName: Table | string, indices: TableIndex[]): Promise<void> {
         const promises = indices.map(index => this.dropIndex(tableOrName, index));
         await Promise.all(promises);
     }
@@ -770,7 +770,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
 
         // create table schemas for loaded tables
         return Promise.all(dbTables.map(async dbTable => {
-            const table = new Table({name: dbTable["name"]});
+            const table = new Table({ name: dbTable["name"] });
             const sql = dbTable["sql"];
 
             // load columns and indices
@@ -781,7 +781,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
             ]);
 
             // find column name with auto increment
-            let autoIncrementColumnName: string|undefined = undefined;
+            let autoIncrementColumnName: string | undefined = undefined;
             const tableSql: string = dbTable["sql"];
             let autoIncrementIndex = tableSql.toUpperCase().indexOf("AUTOINCREMENT");
             if (autoIncrementIndex !== -1) {
@@ -1008,7 +1008,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Builds drop table sql.
      */
-    protected dropTableSql(tableOrName: Table|string, ifExist?: boolean): Query {
+    protected dropTableSql(tableOrName: Table | string, ifExist?: boolean): Query {
         const tableName = tableOrName instanceof Table ? tableOrName.name : tableOrName;
         const query = ifExist ? `DROP TABLE IF EXISTS "${tableName}"` : `DROP TABLE "${tableName}"`;
         return new Query(query);
@@ -1036,7 +1036,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Builds drop view sql.
      */
-    protected dropViewSql(viewOrPath: View|string): Query {
+    protected dropViewSql(viewOrPath: View | string): Query {
         const viewName = viewOrPath instanceof View ? viewOrPath.name : viewOrPath;
         return new Query(`DROP VIEW "${viewName}"`);
     }
@@ -1044,7 +1044,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Builds remove view sql.
      */
-    protected deleteViewDefinitionSql(viewOrPath: View|string): Query {
+    protected deleteViewDefinitionSql(viewOrPath: View | string): Query {
         const viewName = viewOrPath instanceof View ? viewOrPath.name : viewOrPath;
         const qb = this.connection.createQueryBuilder();
         const [query, parameters] = qb.delete()
@@ -1067,7 +1067,7 @@ export abstract class AbstractSqliteQueryRunner extends BaseQueryRunner implemen
     /**
      * Builds drop index sql.
      */
-    protected dropIndexSql(indexOrName: TableIndex|string): Query {
+    protected dropIndexSql(indexOrName: TableIndex | string): Query {
         let indexName = indexOrName instanceof TableIndex ? indexOrName.name : indexOrName;
         return new Query(`DROP INDEX "${indexName}"`);
     }

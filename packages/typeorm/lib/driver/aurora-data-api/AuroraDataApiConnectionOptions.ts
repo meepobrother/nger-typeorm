@@ -1,5 +1,5 @@
-import {BaseConnectionOptions} from "../../connection/BaseConnectionOptions";
-import {AuroraDataApiConnectionCredentialsOptions} from "./AuroraDataApiConnectionCredentialsOptions";
+import { BaseConnectionOptions } from "../../connection/BaseConnectionOptions";
+import { AuroraDataApiConnectionCredentialsOptions } from "./AuroraDataApiConnectionCredentialsOptions";
 
 /**
  * MySQL specific connection options.

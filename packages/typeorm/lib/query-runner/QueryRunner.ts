@@ -11,7 +11,7 @@ import { TableUnique } from "../schema-builder/table/TableUnique";
 import { View } from "../schema-builder/view/View";
 import { Broadcaster } from "../subscriber/Broadcaster";
 import { TableCheck } from "../schema-builder/table/TableCheck";
-import { IsolationLevel } from "../driver/types/IsolationLevel";
+import { IsolationLevel } from "../driver/driver-types/IsolationLevel";
 import { TableExclusion } from "../schema-builder/table/TableExclusion";
 
 /**

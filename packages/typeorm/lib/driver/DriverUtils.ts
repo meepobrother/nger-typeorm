@@ -1,9 +1,9 @@
 import { Driver } from "./Driver";
 import { hash } from "../util/StringUtils";
 
-    /**
- * Common driver utility functions.
- */
+/**
+* Common driver utility functions.
+*/
 export class DriverUtils {
 
     // -------------------------------------------------------------------------

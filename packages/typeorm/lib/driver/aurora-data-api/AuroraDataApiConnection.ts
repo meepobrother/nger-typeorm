@@ -1,6 +1,6 @@
-import {AuroraDataApiQueryRunner} from "./AuroraDataApiQueryRunner";
-import {Connection} from "../../connection/Connection";
-import {ConnectionOptions, QueryRunner} from "../..";
+import { AuroraDataApiQueryRunner } from "./AuroraDataApiQueryRunner";
+import { Connection } from "../../connection/Connection";
+import { ConnectionOptions, QueryRunner } from "../..";
 
 /**
  * Organizes communication with MySQL DBMS.

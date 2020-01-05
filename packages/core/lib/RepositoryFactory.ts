@@ -1,9 +1,7 @@
-import { RepositoryFactory } from 'typeorm/repository/RepositoryFactory'
-import { EntityMetadata, QueryRunner } from 'typeorm'
+import { EntityMetadata, QueryRunner, MongoDriver, RepositoryFactory } from '@nger/typeorm-native'
 import { NgerEntityManager } from './EntityManager';
 import { NgerRepository } from './Repository';
 import { NgerTreeRepository } from './TreeRepository';
-import { MongoDriver } from 'typeorm/driver/mongodb/MongoDriver';
 import { NgerMongoRepository } from './MongoRepository';
 export class NgerRepositoryFactory extends RepositoryFactory {
     create(manager: NgerEntityManager, metadata: EntityMetadata, queryRunner?: QueryRunner): NgerRepository<any> {

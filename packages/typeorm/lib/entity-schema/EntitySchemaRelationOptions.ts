@@ -1,9 +1,9 @@
 import { JoinColumnOptions } from "../decorator/options/JoinColumnOptions";
-import { RelationType } from "../metadata/types/RelationTypes";
+import { RelationType } from "../metadata/metadata-types/RelationTypes";
 import { JoinTableMultipleColumnsOptions } from "../decorator/options/JoinTableMultipleColumnsOptions";
-import { DeferrableType } from "../metadata/types/DeferrableType";
-import { OnDeleteType } from "../metadata/types/OnDeleteType";
-import { OnUpdateType } from "../metadata/types/OnUpdateType";
+import { DeferrableType } from "../metadata/metadata-types/DeferrableType";
+import { OnDeleteType } from "../metadata/metadata-types/OnDeleteType";
+import { OnUpdateType } from "../metadata/metadata-types/OnUpdateType";
 import { JoinTableOptions } from "../index";
 
 export interface EntitySchemaRelationOptions {

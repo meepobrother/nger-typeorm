@@ -1,6 +1,6 @@
 import { getConnection, getMetadataArgsStorage, MongoRepository, Repository, TreeRepository, EntityManager } from "../../";
 import { TransactionOptions } from "../options/TransactionOptions";
-import { IsolationLevel } from "../../driver/types/IsolationLevel";
+import { IsolationLevel } from "../../driver/driver-types/IsolationLevel";
 
 /**
  * Wraps some method into the transaction.

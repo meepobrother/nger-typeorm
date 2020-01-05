@@ -1,8 +1,7 @@
-import { SelectQueryBuilder, QueryBuilder } from "typeorm";
+import { SelectQueryBuilder, QueryBuilder, ReadStream } from "@nger/typeorm-native";
 import { getCurrentInjector } from "@nger/core";
 import { TYPEORM_HOOK } from "./token";
 import { NgerConnection } from './Connection'
-import { ReadStream } from "typeorm/platform/PlatformTools";
 export class NgerSelectQueryBuilder<T> extends SelectQueryBuilder<T> {
     async getRawMany(): Promise<any[]> {
         __beforeQuery(this)

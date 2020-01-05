@@ -1,27 +1,27 @@
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {QueryFailedError} from "../../error/QueryFailedError";
-import {QueryRunnerAlreadyReleasedError} from "../../error/QueryRunnerAlreadyReleasedError";
-import {TransactionAlreadyStartedError} from "../../error/TransactionAlreadyStartedError";
-import {TransactionNotStartedError} from "../../error/TransactionNotStartedError";
-import {ColumnType, PromiseUtils} from "../../index";
-import {ReadStream} from "../../platform/PlatformTools";
-import {BaseQueryRunner} from "../../query-runner/BaseQueryRunner";
-import {QueryRunner} from "../../query-runner/QueryRunner";
-import {TableIndexOptions} from "../../schema-builder/options/TableIndexOptions";
-import {Table} from "../../schema-builder/table/Table";
-import {TableCheck} from "../../schema-builder/table/TableCheck";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {TableExclusion} from "../../schema-builder/table/TableExclusion";
-import {TableForeignKey} from "../../schema-builder/table/TableForeignKey";
-import {TableIndex} from "../../schema-builder/table/TableIndex";
-import {TableUnique} from "../../schema-builder/table/TableUnique";
-import {View} from "../../schema-builder/view/View";
-import {Broadcaster} from "../../subscriber/Broadcaster";
-import {OrmUtils} from "../../util/OrmUtils";
-import {Query} from "../Query";
-import {IsolationLevel} from "../types/IsolationLevel";
-import {MssqlParameter} from "./MssqlParameter";
-import {SqlServerDriver} from "./SqlServerDriver";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { QueryFailedError } from "../../error/QueryFailedError";
+import { QueryRunnerAlreadyReleasedError } from "../../error/QueryRunnerAlreadyReleasedError";
+import { TransactionAlreadyStartedError } from "../../error/TransactionAlreadyStartedError";
+import { TransactionNotStartedError } from "../../error/TransactionNotStartedError";
+import { ColumnType, PromiseUtils } from "../../index";
+import { ReadStream } from "../../platform/PlatformTools";
+import { BaseQueryRunner } from "../../query-runner/BaseQueryRunner";
+import { QueryRunner } from "../../query-runner/QueryRunner";
+import { TableIndexOptions } from "../../schema-builder/options/TableIndexOptions";
+import { Table } from "../../schema-builder/table/Table";
+import { TableCheck } from "../../schema-builder/table/TableCheck";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { TableExclusion } from "../../schema-builder/table/TableExclusion";
+import { TableForeignKey } from "../../schema-builder/table/TableForeignKey";
+import { TableIndex } from "../../schema-builder/table/TableIndex";
+import { TableUnique } from "../../schema-builder/table/TableUnique";
+import { View } from "../../schema-builder/view/View";
+import { Broadcaster } from "../../subscriber/Broadcaster";
+import { OrmUtils } from "../../util/OrmUtils";
+import { Query } from "../Query";
+import { IsolationLevel } from "../driver-types/IsolationLevel";
+import { MssqlParameter } from "./MssqlParameter";
+import { SqlServerDriver } from "./SqlServerDriver";
 
 /**
  * Runs queries on a single SQL Server database connection.
@@ -54,7 +54,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     // Constructor
     // -------------------------------------------------------------------------
 
-    constructor(driver: SqlServerDriver, mode: "master"|"slave" = "master") {
+    constructor(driver: SqlServerDriver, mode: "master" | "slave" = "master") {
         super();
         this.driver = driver;
         this.connection = driver.connection;
@@ -345,7 +345,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Checks if table with the given name exist in the database.
      */
-    async hasTable(tableOrName: Table|string): Promise<boolean> {
+    async hasTable(tableOrName: Table | string): Promise<boolean> {
         const parsedTableName = this.parseTableName(tableOrName);
         const schema = parsedTableName.schema === "SCHEMA_NAME()" ? parsedTableName.schema : `'${parsedTableName.schema}'`;
         const sql = `SELECT * FROM "${parsedTableName.database}"."INFORMATION_SCHEMA"."TABLES" WHERE "TABLE_NAME" = '${parsedTableName.name}' AND "TABLE_SCHEMA" = ${schema}`;
@@ -356,7 +356,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Checks if column exist in the table.
      */
-    async hasColumn(tableOrName: Table|string, columnName: string): Promise<boolean> {
+    async hasColumn(tableOrName: Table | string, columnName: string): Promise<boolean> {
         const parsedTableName = this.parseTableName(tableOrName);
         const schema = parsedTableName.schema === "SCHEMA_NAME()" ? parsedTableName.schema : `'${parsedTableName.schema}'`;
         const sql = `SELECT * FROM "${parsedTableName.database}"."INFORMATION_SCHEMA"."TABLES" WHERE "TABLE_NAME" = '${parsedTableName.name}' AND "COLUMN_NAME" = '${columnName}' AND "TABLE_SCHEMA" = ${schema}`;
@@ -480,7 +480,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops the table.
      */
-    async dropTable(tableOrName: Table|string, ifExist?: boolean, dropForeignKeys: boolean = true, dropIndices: boolean = true): Promise<void> {
+    async dropTable(tableOrName: Table | string, ifExist?: boolean, dropForeignKeys: boolean = true, dropIndices: boolean = true): Promise<void> {
         if (ifExist) {
             const isTableExist = await this.hasTable(tableOrName);
             if (!isTableExist) return Promise.resolve();
@@ -529,7 +529,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops the view.
      */
-    async dropView(target: View|string): Promise<void> {
+    async dropView(target: View | string): Promise<void> {
         const viewName = target instanceof View ? target.name : target;
         const view = await this.getCachedView(viewName);
 
@@ -545,15 +545,15 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Renames a table.
      */
-    async renameTable(oldTableOrName: Table|string, newTableName: string): Promise<void> {
+    async renameTable(oldTableOrName: Table | string, newTableName: string): Promise<void> {
         const upQueries: Query[] = [];
         const downQueries: Query[] = [];
         const oldTable = oldTableOrName instanceof Table ? oldTableOrName : await this.getCachedTable(oldTableOrName);
         let newTable = oldTable.clone();
 
         // we need database name and schema name to rename FK constraints
-        let dbName: string|undefined = undefined;
-        let schemaName: string|undefined = undefined;
+        let dbName: string | undefined = undefined;
+        let schemaName: string | undefined = undefined;
         let oldTableName: string = oldTable.name;
         const splittedName = oldTable.name.split(".");
         if (splittedName.length === 3) {
@@ -648,7 +648,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new column from the column in the table.
      */
-    async addColumn(tableOrName: Table|string, column: TableColumn): Promise<void> {
+    async addColumn(tableOrName: Table | string, column: TableColumn): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const clonedTable = table.clone();
         const upQueries: Query[] = [];
@@ -685,8 +685,8 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
         // create unique constraint
         if (column.isUnique) {
             const uniqueConstraint = new TableUnique({
-               name: this.connection.namingStrategy.uniqueConstraintName(table.name, [column.name]),
-               columnNames: [column.name]
+                name: this.connection.namingStrategy.uniqueConstraintName(table.name, [column.name]),
+                columnNames: [column.name]
             });
             clonedTable.uniques.push(uniqueConstraint);
             upQueries.push(new Query(`ALTER TABLE ${this.escapePath(table)} ADD CONSTRAINT "${uniqueConstraint.name}" UNIQUE ("${column.name}")`));
@@ -708,20 +708,20 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new columns from the column in the table.
      */
-    async addColumns(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async addColumns(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         await PromiseUtils.runInSequence(columns, column => this.addColumn(tableOrName, column));
     }
 
     /**
      * Renames column in the given table.
      */
-    async renameColumn(tableOrName: Table|string, oldTableColumnOrName: TableColumn|string, newTableColumnOrName: TableColumn|string): Promise<void> {
+    async renameColumn(tableOrName: Table | string, oldTableColumnOrName: TableColumn | string, newTableColumnOrName: TableColumn | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const oldColumn = oldTableColumnOrName instanceof TableColumn ? oldTableColumnOrName : table.columns.find(c => c.name === oldTableColumnOrName);
         if (!oldColumn)
             throw new Error(`Column "${oldTableColumnOrName}" was not found in the "${table.name}" table.`);
 
-        let newColumn: TableColumn|undefined = undefined;
+        let newColumn: TableColumn | undefined = undefined;
         if (newTableColumnOrName instanceof TableColumn) {
             newColumn = newTableColumnOrName;
         } else {
@@ -735,7 +735,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Changes a column in the table.
      */
-    async changeColumn(tableOrName: Table|string, oldTableColumnOrName: TableColumn|string, newColumn: TableColumn): Promise<void> {
+    async changeColumn(tableOrName: Table | string, oldTableColumnOrName: TableColumn | string, newColumn: TableColumn): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         let clonedTable = table.clone();
         const upQueries: Query[] = [];
@@ -760,8 +760,8 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
             if (newColumn.name !== oldColumn.name) {
 
                 // we need database name and schema name to rename FK constraints
-                let dbName: string|undefined = undefined;
-                let schemaName: string|undefined = undefined;
+                let dbName: string | undefined = undefined;
+                let schemaName: string | undefined = undefined;
                 const splittedName = table.name.split(".");
                 if (splittedName.length === 3) {
                     dbName = splittedName[0];
@@ -960,14 +960,14 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Changes a column in the table.
      */
-    async changeColumns(tableOrName: Table|string, changedColumns: { newColumn: TableColumn, oldColumn: TableColumn }[]): Promise<void> {
+    async changeColumns(tableOrName: Table | string, changedColumns: { newColumn: TableColumn, oldColumn: TableColumn }[]): Promise<void> {
         await PromiseUtils.runInSequence(changedColumns, changedColumn => this.changeColumn(tableOrName, changedColumn.oldColumn, changedColumn.newColumn));
     }
 
     /**
      * Drops column in the table.
      */
-    async dropColumn(tableOrName: Table|string, columnOrName: TableColumn|string): Promise<void> {
+    async dropColumn(tableOrName: Table | string, columnOrName: TableColumn | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const column = columnOrName instanceof TableColumn ? columnOrName : table.findColumnByName(columnOrName);
         if (!column)
@@ -1040,14 +1040,14 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops the columns in the table.
      */
-    async dropColumns(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async dropColumns(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         await PromiseUtils.runInSequence(columns, column => this.dropColumn(tableOrName, column));
     }
 
     /**
      * Creates a new primary key.
      */
-    async createPrimaryKey(tableOrName: Table|string, columnNames: string[]): Promise<void> {
+    async createPrimaryKey(tableOrName: Table | string, columnNames: string[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const clonedTable = table.clone();
 
@@ -1067,7 +1067,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Updates composite primary keys.
      */
-    async updatePrimaryKeys(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async updatePrimaryKeys(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const clonedTable = table.clone();
         const columnNames = columns.map(column => column.name);
@@ -1100,7 +1100,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops a primary key.
      */
-    async dropPrimaryKey(tableOrName: Table|string): Promise<void> {
+    async dropPrimaryKey(tableOrName: Table | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const up = this.dropPrimaryKeySql(table);
         const down = this.createPrimaryKeySql(table, table.primaryColumns.map(column => column.name));
@@ -1113,7 +1113,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new unique constraint.
      */
-    async createUniqueConstraint(tableOrName: Table|string, uniqueConstraint: TableUnique): Promise<void> {
+    async createUniqueConstraint(tableOrName: Table | string, uniqueConstraint: TableUnique): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new unique constraint may be passed without name. In this case we generate unique name manually.
@@ -1129,7 +1129,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new unique constraints.
      */
-    async createUniqueConstraints(tableOrName: Table|string, uniqueConstraints: TableUnique[]): Promise<void> {
+    async createUniqueConstraints(tableOrName: Table | string, uniqueConstraints: TableUnique[]): Promise<void> {
         const promises = uniqueConstraints.map(uniqueConstraint => this.createUniqueConstraint(tableOrName, uniqueConstraint));
         await Promise.all(promises);
     }
@@ -1137,7 +1137,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops unique constraint.
      */
-    async dropUniqueConstraint(tableOrName: Table|string, uniqueOrName: TableUnique|string): Promise<void> {
+    async dropUniqueConstraint(tableOrName: Table | string, uniqueOrName: TableUnique | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const uniqueConstraint = uniqueOrName instanceof TableUnique ? uniqueOrName : table.uniques.find(u => u.name === uniqueOrName);
         if (!uniqueConstraint)
@@ -1152,7 +1152,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops an unique constraints.
      */
-    async dropUniqueConstraints(tableOrName: Table|string, uniqueConstraints: TableUnique[]): Promise<void> {
+    async dropUniqueConstraints(tableOrName: Table | string, uniqueConstraints: TableUnique[]): Promise<void> {
         const promises = uniqueConstraints.map(uniqueConstraint => this.dropUniqueConstraint(tableOrName, uniqueConstraint));
         await Promise.all(promises);
     }
@@ -1160,7 +1160,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new check constraint.
      */
-    async createCheckConstraint(tableOrName: Table|string, checkConstraint: TableCheck): Promise<void> {
+    async createCheckConstraint(tableOrName: Table | string, checkConstraint: TableCheck): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new unique constraint may be passed without name. In this case we generate unique name manually.
@@ -1176,7 +1176,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new check constraints.
      */
-    async createCheckConstraints(tableOrName: Table|string, checkConstraints: TableCheck[]): Promise<void> {
+    async createCheckConstraints(tableOrName: Table | string, checkConstraints: TableCheck[]): Promise<void> {
         const promises = checkConstraints.map(checkConstraint => this.createCheckConstraint(tableOrName, checkConstraint));
         await Promise.all(promises);
     }
@@ -1184,7 +1184,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops check constraint.
      */
-    async dropCheckConstraint(tableOrName: Table|string, checkOrName: TableCheck|string): Promise<void> {
+    async dropCheckConstraint(tableOrName: Table | string, checkOrName: TableCheck | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const checkConstraint = checkOrName instanceof TableCheck ? checkOrName : table.checks.find(c => c.name === checkOrName);
         if (!checkConstraint)
@@ -1199,7 +1199,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops check constraints.
      */
-    async dropCheckConstraints(tableOrName: Table|string, checkConstraints: TableCheck[]): Promise<void> {
+    async dropCheckConstraints(tableOrName: Table | string, checkConstraints: TableCheck[]): Promise<void> {
         const promises = checkConstraints.map(checkConstraint => this.dropCheckConstraint(tableOrName, checkConstraint));
         await Promise.all(promises);
     }
@@ -1207,35 +1207,35 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new exclusion constraint.
      */
-    async createExclusionConstraint(tableOrName: Table|string, exclusionConstraint: TableExclusion): Promise<void> {
+    async createExclusionConstraint(tableOrName: Table | string, exclusionConstraint: TableExclusion): Promise<void> {
         throw new Error(`SqlServer does not support exclusion constraints.`);
     }
 
     /**
      * Creates a new exclusion constraints.
      */
-    async createExclusionConstraints(tableOrName: Table|string, exclusionConstraints: TableExclusion[]): Promise<void> {
+    async createExclusionConstraints(tableOrName: Table | string, exclusionConstraints: TableExclusion[]): Promise<void> {
         throw new Error(`SqlServer does not support exclusion constraints.`);
     }
 
     /**
      * Drops exclusion constraint.
      */
-    async dropExclusionConstraint(tableOrName: Table|string, exclusionOrName: TableExclusion|string): Promise<void> {
+    async dropExclusionConstraint(tableOrName: Table | string, exclusionOrName: TableExclusion | string): Promise<void> {
         throw new Error(`SqlServer does not support exclusion constraints.`);
     }
 
     /**
      * Drops exclusion constraints.
      */
-    async dropExclusionConstraints(tableOrName: Table|string, exclusionConstraints: TableExclusion[]): Promise<void> {
+    async dropExclusionConstraints(tableOrName: Table | string, exclusionConstraints: TableExclusion[]): Promise<void> {
         throw new Error(`SqlServer does not support exclusion constraints.`);
     }
 
     /**
      * Creates a new foreign key.
      */
-    async createForeignKey(tableOrName: Table|string, foreignKey: TableForeignKey): Promise<void> {
+    async createForeignKey(tableOrName: Table | string, foreignKey: TableForeignKey): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new FK may be passed without name. In this case we generate FK name manually.
@@ -1251,7 +1251,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new foreign keys.
      */
-    async createForeignKeys(tableOrName: Table|string, foreignKeys: TableForeignKey[]): Promise<void> {
+    async createForeignKeys(tableOrName: Table | string, foreignKeys: TableForeignKey[]): Promise<void> {
         const promises = foreignKeys.map(foreignKey => this.createForeignKey(tableOrName, foreignKey));
         await Promise.all(promises);
     }
@@ -1259,7 +1259,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops a foreign key from the table.
      */
-    async dropForeignKey(tableOrName: Table|string, foreignKeyOrName: TableForeignKey|string): Promise<void> {
+    async dropForeignKey(tableOrName: Table | string, foreignKeyOrName: TableForeignKey | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const foreignKey = foreignKeyOrName instanceof TableForeignKey ? foreignKeyOrName : table.foreignKeys.find(fk => fk.name === foreignKeyOrName);
         if (!foreignKey)
@@ -1274,7 +1274,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops a foreign keys from the table.
      */
-    async dropForeignKeys(tableOrName: Table|string, foreignKeys: TableForeignKey[]): Promise<void> {
+    async dropForeignKeys(tableOrName: Table | string, foreignKeys: TableForeignKey[]): Promise<void> {
         const promises = foreignKeys.map(foreignKey => this.dropForeignKey(tableOrName, foreignKey));
         await Promise.all(promises);
     }
@@ -1282,7 +1282,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new index.
      */
-    async createIndex(tableOrName: Table|string, index: TableIndex): Promise<void> {
+    async createIndex(tableOrName: Table | string, index: TableIndex): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new index may be passed without name. In this case we generate index name manually.
@@ -1298,7 +1298,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Creates a new indices
      */
-    async createIndices(tableOrName: Table|string, indices: TableIndex[]): Promise<void> {
+    async createIndices(tableOrName: Table | string, indices: TableIndex[]): Promise<void> {
         const promises = indices.map(index => this.createIndex(tableOrName, index));
         await Promise.all(promises);
     }
@@ -1306,7 +1306,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops an index.
      */
-    async dropIndex(tableOrName: Table|string, indexOrName: TableIndex|string): Promise<void> {
+    async dropIndex(tableOrName: Table | string, indexOrName: TableIndex | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const index = indexOrName instanceof TableIndex ? indexOrName : table.indices.find(i => i.name === indexOrName);
         if (!index)
@@ -1321,7 +1321,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Drops an indices from the table.
      */
-    async dropIndices(tableOrName: Table|string, indices: TableIndex[]): Promise<void> {
+    async dropIndices(tableOrName: Table | string, indices: TableIndex[]): Promise<void> {
         const promises = indices.map(index => this.dropIndex(tableOrName, index));
         await Promise.all(promises);
     }
@@ -1529,7 +1529,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
         const constraintsCondition = tableNames.map(tableName => {
             const [schema, name] = extractTableSchemaAndName(tableName);
             return `("columnUsages"."TABLE_SCHEMA" = '${schema}' AND "columnUsages"."TABLE_NAME" = '${name}' ` +
-             `AND "tableConstraints"."TABLE_SCHEMA" = '${schema}' AND "tableConstraints"."TABLE_NAME" = '${name}')`;
+                `AND "tableConstraints"."TABLE_SCHEMA" = '${schema}' AND "tableConstraints"."TABLE_NAME" = '${name}')`;
         }).join(" OR ");
 
         const constraintsSql = dbNames.map(dbName => {
@@ -1623,7 +1623,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
                             && dbConstraint["COLUMN_NAME"] !== dbColumn["COLUMN_NAME"])
                         : false;
 
-                    const isPrimary = !!columnConstraints.find(constraint =>  constraint["CONSTRAINT_TYPE"] === "PRIMARY KEY");
+                    const isPrimary = !!columnConstraints.find(constraint => constraint["CONSTRAINT_TYPE"] === "PRIMARY KEY");
                     const isGenerated = !!dbIdentityColumns.find(column => {
                         return this.driver.buildTableName(column["TABLE_NAME"], column["TABLE_SCHEMA"], column["TABLE_CATALOG"]) === tableFullName
                             && column["COLUMN_NAME"] === dbColumn["COLUMN_NAME"];
@@ -1846,7 +1846,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Builds drop table sql.
      */
-    protected dropTableSql(tableOrName: Table|string, ifExist?: boolean): Query {
+    protected dropTableSql(tableOrName: Table | string, ifExist?: boolean): Query {
         const query = ifExist ? `DROP TABLE IF EXISTS ${this.escapePath(tableOrName)}` : `DROP TABLE ${this.escapePath(tableOrName)}`;
         return new Query(query);
     }
@@ -1875,14 +1875,14 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Builds drop view sql.
      */
-    protected dropViewSql(viewOrPath: View|string): Query {
+    protected dropViewSql(viewOrPath: View | string): Query {
         return new Query(`DROP VIEW ${this.escapePath(viewOrPath)}`);
     }
 
     /**
      * Builds remove view sql.
      */
-    protected async deleteViewDefinitionSql(viewOrPath: View|string): Promise<Query> {
+    protected async deleteViewDefinitionSql(viewOrPath: View | string): Promise<Query> {
         const currentSchema = await this.getCurrentSchema();
         const parsedTableName = this.parseTableName(viewOrPath, currentSchema);
 
@@ -1909,7 +1909,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Builds drop index sql.
      */
-    protected dropIndexSql(table: Table, indexOrName: TableIndex|string): Query {
+    protected dropIndexSql(table: Table, indexOrName: TableIndex | string): Query {
         let indexName = indexOrName instanceof TableIndex ? indexOrName.name : indexOrName;
         return new Query(`DROP INDEX "${indexName}" ON ${this.escapePath(table)}`);
     }
@@ -1943,7 +1943,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Builds drop unique constraint sql.
      */
-    protected dropUniqueConstraintSql(table: Table, uniqueOrName: TableUnique|string): Query {
+    protected dropUniqueConstraintSql(table: Table, uniqueOrName: TableUnique | string): Query {
         const uniqueName = uniqueOrName instanceof TableUnique ? uniqueOrName.name : uniqueOrName;
         return new Query(`ALTER TABLE ${this.escapePath(table)} DROP CONSTRAINT "${uniqueName}"`);
     }
@@ -1958,7 +1958,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Builds drop check constraint sql.
      */
-    protected dropCheckConstraintSql(table: Table, checkOrName: TableCheck|string): Query {
+    protected dropCheckConstraintSql(table: Table, checkOrName: TableCheck | string): Query {
         const checkName = checkOrName instanceof TableCheck ? checkOrName.name : checkOrName;
         return new Query(`ALTER TABLE ${this.escapePath(table)} DROP CONSTRAINT "${checkName}"`);
     }
@@ -1982,7 +1982,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Builds drop foreign key sql.
      */
-    protected dropForeignKeySql(table: Table, foreignKeyOrName: TableForeignKey|string): Query {
+    protected dropForeignKeySql(table: Table, foreignKeyOrName: TableForeignKey | string): Query {
         const foreignKeyName = foreignKeyOrName instanceof TableForeignKey ? foreignKeyOrName.name : foreignKeyOrName;
         return new Query(`ALTER TABLE ${this.escapePath(table)} DROP CONSTRAINT "${foreignKeyName}"`);
     }
@@ -1990,7 +1990,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
     /**
      * Escapes given table or View path.
      */
-    protected escapePath(target: Table|View|string, disableEscape?: boolean): string {
+    protected escapePath(target: Table | View | string, disableEscape?: boolean): string {
         let name = target instanceof Table || target instanceof View ? target.name : target;
         if (this.driver.options.schema) {
             if (name.indexOf(".") === -1) {
@@ -2011,7 +2011,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
         }).join(".");
     }
 
-    protected parseTableName(target: Table|View|string, schema?: string) {
+    protected parseTableName(target: Table | View | string, schema?: string) {
         const tableName = (target instanceof Table || target instanceof View) ? target.name : target;
         if (tableName.split(".").length === 3) {
             return {
@@ -2038,7 +2038,7 @@ export class SqlServerQueryRunner extends BaseQueryRunner implements QueryRunner
      * Concat database name and schema name to the foreign key name.
      * Needs because FK name is relevant to the schema and database.
      */
-    protected buildForeignKeyName(fkName: string, schemaName: string|undefined, dbName: string|undefined): string {
+    protected buildForeignKeyName(fkName: string, schemaName: string | undefined, dbName: string | undefined): string {
         let joinedFkName = fkName;
         if (schemaName)
             joinedFkName = schemaName + "." + joinedFkName;

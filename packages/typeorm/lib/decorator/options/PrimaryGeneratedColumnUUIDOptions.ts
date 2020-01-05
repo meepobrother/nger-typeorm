@@ -13,4 +13,6 @@ export interface PrimaryGeneratedColumnUUIDOptions {
      */
     comment?: string;
 
+    strategy?: `uuid` | 'rowid';
+
 }

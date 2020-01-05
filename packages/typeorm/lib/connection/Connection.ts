@@ -36,7 +36,7 @@ import { SqlServerDriver } from "../driver/sqlserver/SqlServerDriver";
 import { MysqlDriver } from "../driver/mysql/MysqlDriver";
 import { ObjectUtils } from "../util/ObjectUtils";
 import { PromiseUtils } from "../";
-import { IsolationLevel } from "../driver/types/IsolationLevel";
+import { IsolationLevel } from "../driver/driver-types/IsolationLevel";
 import { AuroraDataApiDriver } from "../driver/aurora-data-api/AuroraDataApiDriver";
 
 /**

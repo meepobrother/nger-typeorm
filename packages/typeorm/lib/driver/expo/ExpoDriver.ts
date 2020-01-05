@@ -1,10 +1,10 @@
-import {AbstractSqliteDriver} from "../sqlite-abstract/AbstractSqliteDriver";
-import {ExpoConnectionOptions} from "./ExpoConnectionOptions";
-import {ExpoQueryRunner} from "./ExpoQueryRunner";
-import {QueryRunner} from "../../query-runner/QueryRunner";
-import {Connection} from "../../connection/Connection";
-import {DriverOptionNotSetError} from "../../error/DriverOptionNotSetError";
-import {DriverPackageNotInstalledError} from "../../error/DriverPackageNotInstalledError";
+import { AbstractSqliteDriver } from "../sqlite-abstract/AbstractSqliteDriver";
+import { ExpoConnectionOptions } from "./ExpoConnectionOptions";
+import { ExpoQueryRunner } from "./ExpoQueryRunner";
+import { QueryRunner } from "../../query-runner/QueryRunner";
+import { Connection } from "../../connection/Connection";
+import { DriverOptionNotSetError } from "../../error/DriverOptionNotSetError";
+import { DriverPackageNotInstalledError } from "../../error/DriverPackageNotInstalledError";
 
 // needed for typescript compiler
 interface Window {
@@ -14,7 +14,7 @@ declare const window: Window;
 
 export class ExpoDriver extends AbstractSqliteDriver {
     options: ExpoConnectionOptions;
-    
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -31,7 +31,7 @@ export class ExpoDriver extends AbstractSqliteDriver {
         // load sqlite package
         this.loadDependencies();
     }
-    
+
 
     // -------------------------------------------------------------------------
     // Public Methods
@@ -51,17 +51,17 @@ export class ExpoDriver extends AbstractSqliteDriver {
             }
         });
     }
-    
+
     /**
      * Creates a query runner used to execute database queries.
      */
-    createQueryRunner(mode: "master"|"slave" = "master"): QueryRunner {
+    createQueryRunner(mode: "master" | "slave" = "master"): QueryRunner {
         if (!this.queryRunner)
             this.queryRunner = new ExpoQueryRunner(this);
 
         return this.queryRunner;
     }
-    
+
     // -------------------------------------------------------------------------
     // Protected Methods
     // -------------------------------------------------------------------------
@@ -81,7 +81,7 @@ export class ExpoDriver extends AbstractSqliteDriver {
                     tsx.executeSql(`PRAGMA foreign_keys = ON;`, [], (t: any, result: any) => {
                         ok(databaseConnection);
                     }, (t: any, err: any) => {
-                        fail({transaction: t, error: err});
+                        fail({ transaction: t, error: err });
                     });
                 }, (err: any) => {
                     fail(err);

@@ -3,12 +3,11 @@ import {
     getConnection, Connection,
     ConnectionManager,
     ConnectionOptions, EntityManager, getMetadataArgsStorage,
-    getManager, useContainer
-} from 'typeorm';
-import { MetadataArgsStorage } from 'typeorm/metadata-args/MetadataArgsStorage'
+    getManager, useContainer, MetadataArgsStorage
+} from '@nger/typeorm-native';
 import { TYPEORM_OPTIONS, TYPEORM_NAME, TYPEORM_ENTITIES, TypeormHook, TYPEORM_HOOK } from './token';
 import { NgerConnectionManager } from './ConnectionManager';
-export * from 'typeorm';
+export * from '@nger/typeorm-native';
 @Module({
     providers: [{
         provide: MetadataArgsStorage,

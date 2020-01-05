@@ -1,23 +1,23 @@
-import {Driver} from "../Driver";
-import {ConnectionIsNotSetError} from "../../error/ConnectionIsNotSetError";
-import {DriverPackageNotInstalledError} from "../../error/DriverPackageNotInstalledError";
-import {DriverUtils} from "../DriverUtils";
-import {MysqlQueryRunner} from "./MysqlQueryRunner";
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {ColumnMetadata} from "../../metadata/ColumnMetadata";
-import {DateUtils} from "../../util/DateUtils";
-import {PlatformTools} from "../../platform/PlatformTools";
-import {Connection} from "../../connection/Connection";
-import {RdbmsSchemaBuilder} from "../../schema-builder/RdbmsSchemaBuilder";
-import {MysqlConnectionOptions} from "./MysqlConnectionOptions";
-import {MappedColumnTypes} from "../types/MappedColumnTypes";
-import {ColumnType} from "../types/ColumnTypes";
-import {DataTypeDefaults} from "../types/DataTypeDefaults";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {MysqlConnectionCredentialsOptions} from "./MysqlConnectionCredentialsOptions";
-import {EntityMetadata} from "../../metadata/EntityMetadata";
-import {OrmUtils} from "../../util/OrmUtils";
-import {ApplyValueTransformers} from "../../util/ApplyValueTransformers";
+import { Driver } from "../Driver";
+import { ConnectionIsNotSetError } from "../../error/ConnectionIsNotSetError";
+import { DriverPackageNotInstalledError } from "../../error/DriverPackageNotInstalledError";
+import { DriverUtils } from "../DriverUtils";
+import { MysqlQueryRunner } from "./MysqlQueryRunner";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { ColumnMetadata } from "../../metadata/ColumnMetadata";
+import { DateUtils } from "../../util/DateUtils";
+import { PlatformTools } from "../../platform/PlatformTools";
+import { Connection } from "../../connection/Connection";
+import { RdbmsSchemaBuilder } from "../../schema-builder/RdbmsSchemaBuilder";
+import { MysqlConnectionOptions } from "./MysqlConnectionOptions";
+import { MappedColumnTypes } from "../driver-types/MappedColumnTypes";
+import { ColumnType } from "../driver-types/ColumnTypes";
+import { DataTypeDefaults } from "../driver-types/DataTypeDefaults";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { MysqlConnectionCredentialsOptions } from "./MysqlConnectionCredentialsOptions";
+import { EntityMetadata } from "../../metadata/EntityMetadata";
+import { OrmUtils } from "../../util/OrmUtils";
+import { ApplyValueTransformers } from "../../util/ApplyValueTransformers";
 
 /**
  * Organizes communication with MySQL DBMS.
@@ -382,7 +382,7 @@ export class MysqlDriver implements Driver {
     /**
      * Creates a query runner used to execute database queries.
      */
-    createQueryRunner(mode: "master"|"slave" = "master") {
+    createQueryRunner(mode: "master" | "slave" = "master") {
         return new MysqlQueryRunner(this, mode);
     }
 
@@ -518,7 +518,7 @@ export class MysqlDriver implements Driver {
     /**
      * Creates a database type from a given column metadata.
      */
-    normalizeType(column: { type: ColumnType, length?: number|string, precision?: number|null, scale?: number }): string {
+    normalizeType(column: { type: ColumnType, length?: number | string, precision?: number | null, scale?: number }): string {
         if (column.type === Number || column.type === "integer") {
             return "int";
 
@@ -607,7 +607,7 @@ export class MysqlDriver implements Driver {
     /**
      * Returns default column lengths, which is required on column creation.
      */
-    getColumnLength(column: ColumnMetadata|TableColumn): string {
+    getColumnLength(column: ColumnMetadata | TableColumn): string {
         if (column.length)
             return column.length.toString();
 
@@ -702,9 +702,9 @@ export class MysqlDriver implements Driver {
             let value: any;
             if (generatedColumn.generationStrategy === "increment" && insertResult.insertId) {
                 value = insertResult.insertId;
-            // } else if (generatedColumn.generationStrategy === "uuid") {
-            //     console.log("getting db value:", generatedColumn.databaseName);
-            //     value = generatedColumn.getEntityValue(uuidMap);
+                // } else if (generatedColumn.generationStrategy === "uuid") {
+                //     console.log("getting db value:", generatedColumn.databaseName);
+                //     value = generatedColumn.getEntityValue(uuidMap);
             }
 
             return OrmUtils.mergeDeep(map, generatedColumn.createValueMap(value));
@@ -851,10 +851,10 @@ export class MysqlDriver implements Driver {
             port: credentials.port,
             ssl: options.ssl
         },
-        options.acquireTimeout === undefined
-          ? {}
-          : { acquireTimeout: options.acquireTimeout },
-        options.extra || {});
+            options.acquireTimeout === undefined
+                ? {}
+                : { acquireTimeout: options.acquireTimeout },
+            options.extra || {});
     }
 
     /**

@@ -4,7 +4,7 @@ import { CircularRelationsError } from "../error/CircularRelationsError";
 import { DepGraph } from "../util/DepGraph";
 import { Driver } from "../driver/Driver";
 import { DataTypeNotSupportedError } from "../error/DataTypeNotSupportedError";
-import { ColumnType } from "../driver/types/ColumnTypes";
+import { ColumnType } from "../driver/driver-types/ColumnTypes";
 import { MongoDriver } from "../driver/mongodb/MongoDriver";
 import { SqlServerDriver } from "../driver/sqlserver/SqlServerDriver";
 import { MysqlDriver } from "../driver/mysql/MysqlDriver";

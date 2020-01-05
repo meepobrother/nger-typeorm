@@ -1,9 +1,10 @@
-import { PrimaryGeneratedColumnType } from "../../driver/types/ColumnTypes";
+import { PrimaryGeneratedColumnType } from "../../driver/driver-types/ColumnTypes";
 
 /**
  * Describes all options for PrimaryGeneratedColumn decorator with numeric generation strategy.
  */
 export interface PrimaryGeneratedColumnNumericOptions {
+    strategy?: 'increment'
 
     /**
      * Column type. Must be one of the value from the ColumnTypes class.

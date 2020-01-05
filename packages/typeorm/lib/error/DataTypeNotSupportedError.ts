@@ -1,5 +1,5 @@
-import {ColumnType} from "../driver/types/ColumnTypes";
-import {DatabaseType} from "../driver/types/DatabaseType";
+import {ColumnType} from "../driver/driver-types/ColumnTypes";
+import {DatabaseType} from "../driver/driver-types/DatabaseType";
 import {ColumnMetadata} from "../metadata/ColumnMetadata";
 
 export class DataTypeNotSupportedError extends Error {

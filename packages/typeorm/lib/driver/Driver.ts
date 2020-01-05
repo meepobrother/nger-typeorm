@@ -1,13 +1,13 @@
-import {QueryRunner} from "../query-runner/QueryRunner";
-import {ColumnMetadata} from "../metadata/ColumnMetadata";
-import {ObjectLiteral} from "../common/ObjectLiteral";
-import {ColumnType} from "./types/ColumnTypes";
-import {MappedColumnTypes} from "./types/MappedColumnTypes";
-import {SchemaBuilder} from "../schema-builder/SchemaBuilder";
-import {DataTypeDefaults} from "./types/DataTypeDefaults";
-import {BaseConnectionOptions} from "../connection/BaseConnectionOptions";
-import {TableColumn} from "../schema-builder/table/TableColumn";
-import {EntityMetadata} from "../metadata/EntityMetadata";
+import { QueryRunner } from "../query-runner/QueryRunner";
+import { ColumnMetadata } from "../metadata/ColumnMetadata";
+import { ObjectLiteral } from "../common/ObjectLiteral";
+import { ColumnType } from "./driver-types/ColumnTypes";
+import { MappedColumnTypes } from "./driver-types/MappedColumnTypes";
+import { SchemaBuilder } from "../schema-builder/SchemaBuilder";
+import { DataTypeDefaults } from "./driver-types/DataTypeDefaults";
+import { BaseConnectionOptions } from "../connection/BaseConnectionOptions";
+import { TableColumn } from "../schema-builder/table/TableColumn";
+import { EntityMetadata } from "../metadata/EntityMetadata";
 
 /**
  * Driver organizes TypeORM communication with specific database management system.
@@ -102,7 +102,7 @@ export interface Driver {
     /**
      * Creates a query runner used for common queries.
      */
-    createQueryRunner(mode: "master"|"slave"): QueryRunner;
+    createQueryRunner(mode: "master" | "slave"): QueryRunner;
 
     /**
      * Replaces parameters in the given sql with special escaping character
@@ -136,7 +136,7 @@ export interface Driver {
     /**
      * Transforms type of the given column to a database column type.
      */
-    normalizeType(column: { type?: ColumnType|string, length?: number|string, precision?: number|null, scale?: number, isArray?: boolean }): string;
+    normalizeType(column: { type?: ColumnType | string, length?: number | string, precision?: number | null, scale?: number, isArray?: boolean }): string;
 
     /**
      * Normalizes "default" value of the column.
@@ -175,7 +175,7 @@ export interface Driver {
     /**
      * Creates generated map of values generated or returned by database after INSERT query.
      */
-    createGeneratedMap(metadata: EntityMetadata, insertResult: any): ObjectLiteral|undefined;
+    createGeneratedMap(metadata: EntityMetadata, insertResult: any): ObjectLiteral | undefined;
 
     /**
      * Differentiate columns of this table and columns from the given column metadatas columns

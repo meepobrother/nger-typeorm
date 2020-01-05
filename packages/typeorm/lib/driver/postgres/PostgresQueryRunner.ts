@@ -1,27 +1,27 @@
-import {PromiseUtils} from "../../";
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {QueryFailedError} from "../../error/QueryFailedError";
-import {QueryRunnerAlreadyReleasedError} from "../../error/QueryRunnerAlreadyReleasedError";
-import {TransactionAlreadyStartedError} from "../../error/TransactionAlreadyStartedError";
-import {TransactionNotStartedError} from "../../error/TransactionNotStartedError";
-import {ColumnType} from "../../index";
-import {ReadStream} from "../../platform/PlatformTools";
-import {BaseQueryRunner} from "../../query-runner/BaseQueryRunner";
-import {QueryRunner} from "../../query-runner/QueryRunner";
-import {TableIndexOptions} from "../../schema-builder/options/TableIndexOptions";
-import {Table} from "../../schema-builder/table/Table";
-import {TableCheck} from "../../schema-builder/table/TableCheck";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {TableExclusion} from "../../schema-builder/table/TableExclusion";
-import {TableForeignKey} from "../../schema-builder/table/TableForeignKey";
-import {TableIndex} from "../../schema-builder/table/TableIndex";
-import {TableUnique} from "../../schema-builder/table/TableUnique";
-import {View} from "../../schema-builder/view/View";
-import {Broadcaster} from "../../subscriber/Broadcaster";
-import {OrmUtils} from "../../util/OrmUtils";
-import {Query} from "../Query";
-import {IsolationLevel} from "../types/IsolationLevel";
-import {PostgresDriver} from "./PostgresDriver";
+import { PromiseUtils } from "../../";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { QueryFailedError } from "../../error/QueryFailedError";
+import { QueryRunnerAlreadyReleasedError } from "../../error/QueryRunnerAlreadyReleasedError";
+import { TransactionAlreadyStartedError } from "../../error/TransactionAlreadyStartedError";
+import { TransactionNotStartedError } from "../../error/TransactionNotStartedError";
+import { ColumnType } from "../../index";
+import { ReadStream } from "../../platform/PlatformTools";
+import { BaseQueryRunner } from "../../query-runner/BaseQueryRunner";
+import { QueryRunner } from "../../query-runner/QueryRunner";
+import { TableIndexOptions } from "../../schema-builder/options/TableIndexOptions";
+import { Table } from "../../schema-builder/table/Table";
+import { TableCheck } from "../../schema-builder/table/TableCheck";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { TableExclusion } from "../../schema-builder/table/TableExclusion";
+import { TableForeignKey } from "../../schema-builder/table/TableForeignKey";
+import { TableIndex } from "../../schema-builder/table/TableIndex";
+import { TableUnique } from "../../schema-builder/table/TableUnique";
+import { View } from "../../schema-builder/view/View";
+import { Broadcaster } from "../../subscriber/Broadcaster";
+import { OrmUtils } from "../../util/OrmUtils";
+import { Query } from "../Query";
+import { IsolationLevel } from "../driver-types/IsolationLevel";
+import { PostgresDriver } from "./PostgresDriver";
 
 /**
  * Runs queries on a single postgres database connection.
@@ -55,7 +55,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     // Constructor
     // -------------------------------------------------------------------------
 
-    constructor(driver: PostgresDriver, mode: "master"|"slave" = "master") {
+    constructor(driver: PostgresDriver, mode: "master" | "slave" = "master") {
         super();
         this.driver = driver;
         this.connection = driver.connection;
@@ -78,8 +78,8 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
         if (this.databaseConnectionPromise)
             return this.databaseConnectionPromise;
 
-        if (this.mode === "slave" && this.driver.isReplicated)  {
-            this.databaseConnectionPromise = this.driver.obtainSlaveConnection().then(([ connection, release]: any[]) => {
+        if (this.mode === "slave" && this.driver.isReplicated) {
+            this.databaseConnectionPromise = this.driver.obtainSlaveConnection().then(([connection, release]: any[]) => {
                 this.driver.connectedQueryRunners.push(this);
                 this.databaseConnection = connection;
                 this.releaseCallback = release;
@@ -251,7 +251,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Checks if table with the given name exist in the database.
      */
-    async hasTable(tableOrName: Table|string): Promise<boolean> {
+    async hasTable(tableOrName: Table | string): Promise<boolean> {
         const parsedTableName = this.parseTableName(tableOrName);
         const sql = `SELECT * FROM "information_schema"."tables" WHERE "table_schema" = ${parsedTableName.schema} AND "table_name" = ${parsedTableName.tableName}`;
         const result = await this.query(sql);
@@ -261,7 +261,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Checks if column with the given name exist in the given table.
      */
-    async hasColumn(tableOrName: Table|string, columnName: string): Promise<boolean> {
+    async hasColumn(tableOrName: Table | string, columnName: string): Promise<boolean> {
         const parsedTableName = this.parseTableName(tableOrName);
         const sql = `SELECT * FROM "information_schema"."columns" WHERE "table_schema" = ${parsedTableName.schema} AND "table_name" = ${parsedTableName.tableName} AND "column_name" = '${columnName}'`;
         const result = await this.query(sql);
@@ -352,7 +352,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops the table.
      */
-    async dropTable(target: Table|string, ifExist?: boolean, dropForeignKeys: boolean = true, dropIndices: boolean = true): Promise<void> {// It needs because if table does not exist and dropForeignKeys or dropIndices is true, we don't need
+    async dropTable(target: Table | string, ifExist?: boolean, dropForeignKeys: boolean = true, dropIndices: boolean = true): Promise<void> {// It needs because if table does not exist and dropForeignKeys or dropIndices is true, we don't need
         // to perform drop queries for foreign keys and indices.
         if (ifExist) {
             const isTableExist = await this.hasTable(target);
@@ -399,7 +399,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops the view.
      */
-    async dropView(target: View|string): Promise<void> {
+    async dropView(target: View | string): Promise<void> {
         const viewName = target instanceof View ? target.name : target;
         const view = await this.getCachedView(viewName);
 
@@ -415,7 +415,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Renames the given table.
      */
-    async renameTable(oldTableOrName: Table|string, newTableName: string): Promise<void> {
+    async renameTable(oldTableOrName: Table | string, newTableName: string): Promise<void> {
         const upQueries: Query[] = [];
         const downQueries: Query[] = [];
         const oldTable = oldTableOrName instanceof Table ? oldTableOrName : await this.getCachedTable(oldTableOrName);
@@ -493,7 +493,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates a new column from the column in the table.
      */
-    async addColumn(tableOrName: Table|string, column: TableColumn): Promise<void> {
+    async addColumn(tableOrName: Table | string, column: TableColumn): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const clonedTable = table.clone();
         const upQueries: Query[] = [];
@@ -555,14 +555,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates a new columns from the column in the table.
      */
-    async addColumns(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async addColumns(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         await PromiseUtils.runInSequence(columns, column => this.addColumn(tableOrName, column));
     }
 
     /**
      * Renames column in the given table.
      */
-    async renameColumn(tableOrName: Table|string, oldTableColumnOrName: TableColumn|string, newTableColumnOrName: TableColumn|string): Promise<void> {
+    async renameColumn(tableOrName: Table | string, oldTableColumnOrName: TableColumn | string, newTableColumnOrName: TableColumn | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const oldColumn = oldTableColumnOrName instanceof TableColumn ? oldTableColumnOrName : table.columns.find(c => c.name === oldTableColumnOrName);
         if (!oldColumn)
@@ -582,7 +582,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Changes a column in the table.
      */
-    async changeColumn(tableOrName: Table|string, oldTableColumnOrName: TableColumn|string, newColumn: TableColumn): Promise<void> {
+    async changeColumn(tableOrName: Table | string, oldTableColumnOrName: TableColumn | string, newColumn: TableColumn): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         let clonedTable = table.clone();
         const upQueries: Query[] = [];
@@ -873,14 +873,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Changes a column in the table.
      */
-    async changeColumns(tableOrName: Table|string, changedColumns: { newColumn: TableColumn, oldColumn: TableColumn }[]): Promise<void> {
+    async changeColumns(tableOrName: Table | string, changedColumns: { newColumn: TableColumn, oldColumn: TableColumn }[]): Promise<void> {
         await PromiseUtils.runInSequence(changedColumns, changedColumn => this.changeColumn(tableOrName, changedColumn.oldColumn, changedColumn.newColumn));
     }
 
     /**
      * Drops column in the table.
      */
-    async dropColumn(tableOrName: Table|string, columnOrName: TableColumn|string): Promise<void> {
+    async dropColumn(tableOrName: Table | string, columnOrName: TableColumn | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const column = columnOrName instanceof TableColumn ? columnOrName : table.findColumnByName(columnOrName);
         if (!column)
@@ -957,14 +957,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops the columns in the table.
      */
-    async dropColumns(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async dropColumns(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         await PromiseUtils.runInSequence(columns, column => this.dropColumn(tableOrName, column));
     }
 
     /**
      * Creates a new primary key.
      */
-    async createPrimaryKey(tableOrName: Table|string, columnNames: string[]): Promise<void> {
+    async createPrimaryKey(tableOrName: Table | string, columnNames: string[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const clonedTable = table.clone();
 
@@ -984,7 +984,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Updates composite primary keys.
      */
-    async updatePrimaryKeys(tableOrName: Table|string, columns: TableColumn[]): Promise<void> {
+    async updatePrimaryKeys(tableOrName: Table | string, columns: TableColumn[]): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const clonedTable = table.clone();
         const columnNames = columns.map(column => column.name);
@@ -1017,7 +1017,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops a primary key.
      */
-    async dropPrimaryKey(tableOrName: Table|string): Promise<void> {
+    async dropPrimaryKey(tableOrName: Table | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const up = this.dropPrimaryKeySql(table);
         const down = this.createPrimaryKeySql(table, table.primaryColumns.map(column => column.name));
@@ -1030,7 +1030,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates new unique constraint.
      */
-    async createUniqueConstraint(tableOrName: Table|string, uniqueConstraint: TableUnique): Promise<void> {
+    async createUniqueConstraint(tableOrName: Table | string, uniqueConstraint: TableUnique): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new unique constraint may be passed without name. In this case we generate unique name manually.
@@ -1046,14 +1046,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates new unique constraints.
      */
-    async createUniqueConstraints(tableOrName: Table|string, uniqueConstraints: TableUnique[]): Promise<void> {
+    async createUniqueConstraints(tableOrName: Table | string, uniqueConstraints: TableUnique[]): Promise<void> {
         await PromiseUtils.runInSequence(uniqueConstraints, uniqueConstraint => this.createUniqueConstraint(tableOrName, uniqueConstraint));
     }
 
     /**
      * Drops unique constraint.
      */
-    async dropUniqueConstraint(tableOrName: Table|string, uniqueOrName: TableUnique|string): Promise<void> {
+    async dropUniqueConstraint(tableOrName: Table | string, uniqueOrName: TableUnique | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const uniqueConstraint = uniqueOrName instanceof TableUnique ? uniqueOrName : table.uniques.find(u => u.name === uniqueOrName);
         if (!uniqueConstraint)
@@ -1068,14 +1068,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops unique constraints.
      */
-    async dropUniqueConstraints(tableOrName: Table|string, uniqueConstraints: TableUnique[]): Promise<void> {
+    async dropUniqueConstraints(tableOrName: Table | string, uniqueConstraints: TableUnique[]): Promise<void> {
         await PromiseUtils.runInSequence(uniqueConstraints, uniqueConstraint => this.dropUniqueConstraint(tableOrName, uniqueConstraint));
     }
 
     /**
      * Creates new check constraint.
      */
-    async createCheckConstraint(tableOrName: Table|string, checkConstraint: TableCheck): Promise<void> {
+    async createCheckConstraint(tableOrName: Table | string, checkConstraint: TableCheck): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new unique constraint may be passed without name. In this case we generate unique name manually.
@@ -1091,7 +1091,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates new check constraints.
      */
-    async createCheckConstraints(tableOrName: Table|string, checkConstraints: TableCheck[]): Promise<void> {
+    async createCheckConstraints(tableOrName: Table | string, checkConstraints: TableCheck[]): Promise<void> {
         const promises = checkConstraints.map(checkConstraint => this.createCheckConstraint(tableOrName, checkConstraint));
         await Promise.all(promises);
     }
@@ -1099,7 +1099,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops check constraint.
      */
-    async dropCheckConstraint(tableOrName: Table|string, checkOrName: TableCheck|string): Promise<void> {
+    async dropCheckConstraint(tableOrName: Table | string, checkOrName: TableCheck | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const checkConstraint = checkOrName instanceof TableCheck ? checkOrName : table.checks.find(c => c.name === checkOrName);
         if (!checkConstraint)
@@ -1114,7 +1114,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops check constraints.
      */
-    async dropCheckConstraints(tableOrName: Table|string, checkConstraints: TableCheck[]): Promise<void> {
+    async dropCheckConstraints(tableOrName: Table | string, checkConstraints: TableCheck[]): Promise<void> {
         const promises = checkConstraints.map(checkConstraint => this.dropCheckConstraint(tableOrName, checkConstraint));
         await Promise.all(promises);
     }
@@ -1122,7 +1122,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates new exclusion constraint.
      */
-    async createExclusionConstraint(tableOrName: Table|string, exclusionConstraint: TableExclusion): Promise<void> {
+    async createExclusionConstraint(tableOrName: Table | string, exclusionConstraint: TableExclusion): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new unique constraint may be passed without name. In this case we generate unique name manually.
@@ -1138,7 +1138,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates new exclusion constraints.
      */
-    async createExclusionConstraints(tableOrName: Table|string, exclusionConstraints: TableExclusion[]): Promise<void> {
+    async createExclusionConstraints(tableOrName: Table | string, exclusionConstraints: TableExclusion[]): Promise<void> {
         const promises = exclusionConstraints.map(exclusionConstraint => this.createExclusionConstraint(tableOrName, exclusionConstraint));
         await Promise.all(promises);
     }
@@ -1146,7 +1146,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops exclusion constraint.
      */
-    async dropExclusionConstraint(tableOrName: Table|string, exclusionOrName: TableExclusion|string): Promise<void> {
+    async dropExclusionConstraint(tableOrName: Table | string, exclusionOrName: TableExclusion | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const exclusionConstraint = exclusionOrName instanceof TableExclusion ? exclusionOrName : table.exclusions.find(c => c.name === exclusionOrName);
         if (!exclusionConstraint)
@@ -1161,7 +1161,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops exclusion constraints.
      */
-    async dropExclusionConstraints(tableOrName: Table|string, exclusionConstraints: TableExclusion[]): Promise<void> {
+    async dropExclusionConstraints(tableOrName: Table | string, exclusionConstraints: TableExclusion[]): Promise<void> {
         const promises = exclusionConstraints.map(exclusionConstraint => this.dropExclusionConstraint(tableOrName, exclusionConstraint));
         await Promise.all(promises);
     }
@@ -1169,7 +1169,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates a new foreign key.
      */
-    async createForeignKey(tableOrName: Table|string, foreignKey: TableForeignKey): Promise<void> {
+    async createForeignKey(tableOrName: Table | string, foreignKey: TableForeignKey): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new FK may be passed without name. In this case we generate FK name manually.
@@ -1185,14 +1185,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates a new foreign keys.
      */
-    async createForeignKeys(tableOrName: Table|string, foreignKeys: TableForeignKey[]): Promise<void> {
+    async createForeignKeys(tableOrName: Table | string, foreignKeys: TableForeignKey[]): Promise<void> {
         await PromiseUtils.runInSequence(foreignKeys, foreignKey => this.createForeignKey(tableOrName, foreignKey));
     }
 
     /**
      * Drops a foreign key from the table.
      */
-    async dropForeignKey(tableOrName: Table|string, foreignKeyOrName: TableForeignKey|string): Promise<void> {
+    async dropForeignKey(tableOrName: Table | string, foreignKeyOrName: TableForeignKey | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const foreignKey = foreignKeyOrName instanceof TableForeignKey ? foreignKeyOrName : table.foreignKeys.find(fk => fk.name === foreignKeyOrName);
         if (!foreignKey)
@@ -1207,14 +1207,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops a foreign keys from the table.
      */
-    async dropForeignKeys(tableOrName: Table|string, foreignKeys: TableForeignKey[]): Promise<void> {
+    async dropForeignKeys(tableOrName: Table | string, foreignKeys: TableForeignKey[]): Promise<void> {
         await PromiseUtils.runInSequence(foreignKeys, foreignKey => this.dropForeignKey(tableOrName, foreignKey));
     }
 
     /**
      * Creates a new index.
      */
-    async createIndex(tableOrName: Table|string, index: TableIndex): Promise<void> {
+    async createIndex(tableOrName: Table | string, index: TableIndex): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
 
         // new index may be passed without name. In this case we generate index name manually.
@@ -1230,14 +1230,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Creates a new indices
      */
-    async createIndices(tableOrName: Table|string, indices: TableIndex[]): Promise<void> {
+    async createIndices(tableOrName: Table | string, indices: TableIndex[]): Promise<void> {
         await PromiseUtils.runInSequence(indices, index => this.createIndex(tableOrName, index));
     }
 
     /**
      * Drops an index from the table.
      */
-    async dropIndex(tableOrName: Table|string, indexOrName: TableIndex|string): Promise<void> {
+    async dropIndex(tableOrName: Table | string, indexOrName: TableIndex | string): Promise<void> {
         const table = tableOrName instanceof Table ? tableOrName : await this.getCachedTable(tableOrName);
         const index = indexOrName instanceof TableIndex ? indexOrName : table.indices.find(i => i.name === indexOrName);
         if (!index)
@@ -1252,7 +1252,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Drops an indices from the table.
      */
-    async dropIndices(tableOrName: Table|string, indices: TableIndex[]): Promise<void> {
+    async dropIndices(tableOrName: Table | string, indices: TableIndex[]): Promise<void> {
         await PromiseUtils.runInSequence(indices, index => this.dropIndex(tableOrName, index));
     }
 
@@ -1284,7 +1284,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
         await this.startTransaction();
         try {
             const selectViewDropsQuery = `SELECT 'DROP VIEW IF EXISTS "' || schemaname || '"."' || viewname || '" CASCADE;' as "query" ` +
-             `FROM "pg_views" WHERE "schemaname" IN (${schemaNamesString}) AND "viewname" NOT IN ('geography_columns', 'geometry_columns', 'raster_columns', 'raster_overviews')`;
+                `FROM "pg_views" WHERE "schemaname" IN (${schemaNamesString}) AND "viewname" NOT IN ('geography_columns', 'geometry_columns', 'raster_columns', 'raster_overviews')`;
             const dropViewQueries: ObjectLiteral[] = await this.query(selectViewDropsQuery);
             await Promise.all(dropViewQueries.map(q => this.query(q["query"])));
 
@@ -1470,7 +1470,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
                     if (dbColumn["data_type"].toLowerCase() === "array") {
                         tableColumn.isArray = true;
                         const type = tableColumn.type.replace("[]", "");
-                        tableColumn.type = this.connection.driver.normalizeType({type: type});
+                        tableColumn.type = this.connection.driver.normalizeType({ type: type });
                     }
 
                     if (tableColumn.type === "interval"
@@ -1484,9 +1484,9 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
                     if (tableColumn.type.indexOf("enum") !== -1) {
                         tableColumn.type = "enum";
                         const sql = `SELECT "e"."enumlabel" AS "value" FROM "pg_enum" "e" ` +
-                        `INNER JOIN "pg_type" "t" ON "t"."oid" = "e"."enumtypid" ` +
-                        `INNER JOIN "pg_namespace" "n" ON "n"."oid" = "t"."typnamespace" ` +
-                        `WHERE "n"."nspname" = '${dbTable["table_schema"]}' AND "t"."typname" = '${this.buildEnumName(table, tableColumn.name, false, true)}'`;
+                            `INNER JOIN "pg_type" "t" ON "t"."oid" = "e"."enumtypid" ` +
+                            `INNER JOIN "pg_namespace" "n" ON "n"."oid" = "t"."typnamespace" ` +
+                            `WHERE "n"."nspname" = '${dbTable["table_schema"]}' AND "t"."typname" = '${this.buildEnumName(table, tableColumn.name, false, true)}'`;
                         const results: ObjectLiteral[] = await this.query(sql);
                         tableColumn.enum = results.map(result => result["value"]);
                     }
@@ -1734,7 +1734,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds drop table sql.
      */
-    protected dropTableSql(tableOrPath: Table|string): Query {
+    protected dropTableSql(tableOrPath: Table | string): Query {
         return new Query(`DROP TABLE ${this.escapePath(tableOrPath)}`);
     }
 
@@ -1773,14 +1773,14 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds drop view sql.
      */
-    protected dropViewSql(viewOrPath: View|string): Query {
+    protected dropViewSql(viewOrPath: View | string): Query {
         return new Query(`DROP VIEW ${this.escapePath(viewOrPath)}`);
     }
 
     /**
      * Builds remove view sql.
      */
-    protected async deleteViewDefinitionSql(viewOrPath: View|string): Promise<Query> {
+    protected async deleteViewDefinitionSql(viewOrPath: View | string): Promise<Query> {
         const currentSchemaQuery = await this.query(`SELECT * FROM current_schema()`);
         const currentSchema = currentSchemaQuery[0]["current_schema"];
         const viewName = viewOrPath instanceof View ? viewOrPath.name : viewOrPath;
@@ -1806,7 +1806,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Extracts schema name from given Table object or table name string.
      */
-    protected extractSchema(target: Table|string): string|undefined {
+    protected extractSchema(target: Table | string): string | undefined {
         const tableName = target instanceof Table ? target.name : target;
         return tableName.indexOf(".") === -1 ? this.driver.options.schema : tableName.split(".")[0];
     }
@@ -1866,7 +1866,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds drop index sql.
      */
-    protected dropIndexSql(table: Table, indexOrName: TableIndex|string): Query {
+    protected dropIndexSql(table: Table, indexOrName: TableIndex | string): Query {
         let indexName = indexOrName instanceof TableIndex ? indexOrName.name : indexOrName;
         const schema = this.extractSchema(table);
         return schema ? new Query(`DROP INDEX "${schema}"."${indexName}"`) : new Query(`DROP INDEX "${indexName}"`);
@@ -1901,7 +1901,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds drop unique constraint sql.
      */
-    protected dropUniqueConstraintSql(table: Table, uniqueOrName: TableUnique|string): Query {
+    protected dropUniqueConstraintSql(table: Table, uniqueOrName: TableUnique | string): Query {
         const uniqueName = uniqueOrName instanceof TableUnique ? uniqueOrName.name : uniqueOrName;
         return new Query(`ALTER TABLE ${this.escapePath(table)} DROP CONSTRAINT "${uniqueName}"`);
     }
@@ -1916,7 +1916,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds drop check constraint sql.
      */
-    protected dropCheckConstraintSql(table: Table, checkOrName: TableCheck|string): Query {
+    protected dropCheckConstraintSql(table: Table, checkOrName: TableCheck | string): Query {
         const checkName = checkOrName instanceof TableCheck ? checkOrName.name : checkOrName;
         return new Query(`ALTER TABLE ${this.escapePath(table)} DROP CONSTRAINT "${checkName}"`);
     }
@@ -1931,7 +1931,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds drop exclusion constraint sql.
      */
-    protected dropExclusionConstraintSql(table: Table, exclusionOrName: TableExclusion|string): Query {
+    protected dropExclusionConstraintSql(table: Table, exclusionOrName: TableExclusion | string): Query {
         const exclusionName = exclusionOrName instanceof TableExclusion ? exclusionOrName.name : exclusionOrName;
         return new Query(`ALTER TABLE ${this.escapePath(table)} DROP CONSTRAINT "${exclusionName}"`);
     }
@@ -1957,7 +1957,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds drop foreign key sql.
      */
-    protected dropForeignKeySql(table: Table, foreignKeyOrName: TableForeignKey|string): Query {
+    protected dropForeignKeySql(table: Table, foreignKeyOrName: TableForeignKey | string): Query {
         const foreignKeyName = foreignKeyOrName instanceof TableForeignKey ? foreignKeyOrName.name : foreignKeyOrName;
         return new Query(`ALTER TABLE ${this.escapePath(table)} DROP CONSTRAINT "${foreignKeyName}"`);
     }
@@ -1965,10 +1965,10 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds sequence name from given table and column.
      */
-    protected buildSequenceName(table: Table, columnOrName: TableColumn|string, currentSchema?: string, disableEscape?: true, skipSchema?: boolean): string {
+    protected buildSequenceName(table: Table, columnOrName: TableColumn | string, currentSchema?: string, disableEscape?: true, skipSchema?: boolean): string {
         const columnName = columnOrName instanceof TableColumn ? columnOrName.name : columnOrName;
-        let schema: string|undefined = undefined;
-        let tableName: string|undefined = undefined;
+        let schema: string | undefined = undefined;
+        let tableName: string | undefined = undefined;
 
         if (table.name.indexOf(".") === -1) {
             tableName = table.name;
@@ -1988,7 +1988,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Builds ENUM type name from given table and column.
      */
-    protected buildEnumName(table: Table, columnOrName: TableColumn|string, withSchema: boolean = true, disableEscape?: boolean, toOld?: boolean): string {
+    protected buildEnumName(table: Table, columnOrName: TableColumn | string, withSchema: boolean = true, disableEscape?: boolean, toOld?: boolean): string {
         /**
          * If enumName is specified in column options then use it instead
          */
@@ -2028,7 +2028,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Escapes given table or view path.
      */
-    protected escapePath(target: Table|View|string, disableEscape?: boolean): string {
+    protected escapePath(target: Table | View | string, disableEscape?: boolean): string {
         let tableName = target instanceof Table || target instanceof View ? target.name : target;
         tableName = tableName.indexOf(".") === -1 && this.driver.options.schema ? `${this.driver.options.schema}.${tableName}` : tableName;
 
@@ -2040,7 +2040,7 @@ export class PostgresQueryRunner extends BaseQueryRunner implements QueryRunner 
     /**
      * Returns object with table schema and table name.
      */
-    protected parseTableName(target: Table|string) {
+    protected parseTableName(target: Table | string) {
         const tableName = target instanceof Table ? target.name : target;
         if (tableName.indexOf(".") === -1) {
             return {

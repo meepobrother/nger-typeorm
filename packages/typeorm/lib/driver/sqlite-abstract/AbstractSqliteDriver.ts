@@ -1,18 +1,18 @@
-import {Driver} from "../Driver";
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {ColumnMetadata} from "../../metadata/ColumnMetadata";
-import {DateUtils} from "../../util/DateUtils";
-import {Connection} from "../../connection/Connection";
-import {RdbmsSchemaBuilder} from "../../schema-builder/RdbmsSchemaBuilder";
-import {MappedColumnTypes} from "../types/MappedColumnTypes";
-import {ColumnType} from "../types/ColumnTypes";
-import {QueryRunner} from "../../query-runner/QueryRunner";
-import {DataTypeDefaults} from "../types/DataTypeDefaults";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {BaseConnectionOptions} from "../../connection/BaseConnectionOptions";
-import {EntityMetadata} from "../../metadata/EntityMetadata";
-import {OrmUtils} from "../../util/OrmUtils";
-import {ApplyValueTransformers} from "../../util/ApplyValueTransformers";
+import { Driver } from "../Driver";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { ColumnMetadata } from "../../metadata/ColumnMetadata";
+import { DateUtils } from "../../util/DateUtils";
+import { Connection } from "../../connection/Connection";
+import { RdbmsSchemaBuilder } from "../../schema-builder/RdbmsSchemaBuilder";
+import { MappedColumnTypes } from "../driver-types/MappedColumnTypes";
+import { ColumnType } from "../driver-types/ColumnTypes";
+import { QueryRunner } from "../../query-runner/QueryRunner";
+import { DataTypeDefaults } from "../driver-types/DataTypeDefaults";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { BaseConnectionOptions } from "../../connection/BaseConnectionOptions";
+import { EntityMetadata } from "../../metadata/EntityMetadata";
+import { OrmUtils } from "../../util/OrmUtils";
+import { ApplyValueTransformers } from "../../util/ApplyValueTransformers";
 
 /**
  * Organizes communication with sqlite DBMS.
@@ -193,7 +193,7 @@ export abstract class AbstractSqliteDriver implements Driver {
     /**
      * Creates a query runner used to execute database queries.
      */
-    abstract createQueryRunner(mode: "master"|"slave"): QueryRunner;
+    abstract createQueryRunner(mode: "master" | "slave"): QueryRunner;
 
     // -------------------------------------------------------------------------
     // Public Methods
@@ -315,7 +315,7 @@ export abstract class AbstractSqliteDriver implements Driver {
         } else if (columnMetadata.type === "simple-json") {
             value = DateUtils.stringToSimpleJson(value);
 
-        } else if ( columnMetadata.type === "simple-enum" ) {
+        } else if (columnMetadata.type === "simple-enum") {
             value = DateUtils.stringToSimpleEnum(value, columnMetadata);
 
         }
@@ -393,7 +393,7 @@ export abstract class AbstractSqliteDriver implements Driver {
     /**
      * Creates a database type from a given column metadata.
      */
-    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number|null, scale?: number }): string {
+    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number | null, scale?: number }): string {
         if (column.type === Number || column.type === "int") {
             return "integer";
 
@@ -473,7 +473,7 @@ export abstract class AbstractSqliteDriver implements Driver {
             type += "(" + column.precision + "," + column.scale + ")";
 
         } else if (column.precision !== null && column.precision !== undefined) {
-            type +=  "(" + column.precision + ")";
+            type += "(" + column.precision + ")";
         }
 
         if (column.isArray)
@@ -508,8 +508,8 @@ export abstract class AbstractSqliteDriver implements Driver {
             let value: any;
             if (generatedColumn.generationStrategy === "increment" && insertResult) {
                 value = insertResult;
-            // } else if (generatedColumn.generationStrategy === "uuid") {
-            //     value = insertValue[generatedColumn.databaseName];
+                // } else if (generatedColumn.generationStrategy === "uuid") {
+                //     value = insertValue[generatedColumn.databaseName];
             }
 
             if (!value) return map;

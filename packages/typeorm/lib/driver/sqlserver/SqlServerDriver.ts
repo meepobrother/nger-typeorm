@@ -1,24 +1,24 @@
-import {Driver} from "../Driver";
-import {ConnectionIsNotSetError} from "../../error/ConnectionIsNotSetError";
-import {DriverPackageNotInstalledError} from "../../error/DriverPackageNotInstalledError";
-import {DriverUtils} from "../DriverUtils";
-import {SqlServerQueryRunner} from "./SqlServerQueryRunner";
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {ColumnMetadata} from "../../metadata/ColumnMetadata";
-import {DateUtils} from "../../util/DateUtils";
-import {PlatformTools} from "../../platform/PlatformTools";
-import {Connection} from "../../connection/Connection";
-import {RdbmsSchemaBuilder} from "../../schema-builder/RdbmsSchemaBuilder";
-import {SqlServerConnectionOptions} from "./SqlServerConnectionOptions";
-import {MappedColumnTypes} from "../types/MappedColumnTypes";
-import {ColumnType} from "../types/ColumnTypes";
-import {DataTypeDefaults} from "../types/DataTypeDefaults";
-import {MssqlParameter} from "./MssqlParameter";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {SqlServerConnectionCredentialsOptions} from "./SqlServerConnectionCredentialsOptions";
-import {EntityMetadata} from "../../metadata/EntityMetadata";
-import {OrmUtils} from "../../util/OrmUtils";
-import {ApplyValueTransformers} from "../../util/ApplyValueTransformers";
+import { Driver } from "../Driver";
+import { ConnectionIsNotSetError } from "../../error/ConnectionIsNotSetError";
+import { DriverPackageNotInstalledError } from "../../error/DriverPackageNotInstalledError";
+import { DriverUtils } from "../DriverUtils";
+import { SqlServerQueryRunner } from "./SqlServerQueryRunner";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { ColumnMetadata } from "../../metadata/ColumnMetadata";
+import { DateUtils } from "../../util/DateUtils";
+import { PlatformTools } from "../../platform/PlatformTools";
+import { Connection } from "../../connection/Connection";
+import { RdbmsSchemaBuilder } from "../../schema-builder/RdbmsSchemaBuilder";
+import { SqlServerConnectionOptions } from "./SqlServerConnectionOptions";
+import { MappedColumnTypes } from "../driver-types/MappedColumnTypes";
+import { ColumnType } from "../driver-types/ColumnTypes";
+import { DataTypeDefaults } from "../driver-types/DataTypeDefaults";
+import { MssqlParameter } from "./MssqlParameter";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { SqlServerConnectionCredentialsOptions } from "./SqlServerConnectionCredentialsOptions";
+import { EntityMetadata } from "../../metadata/EntityMetadata";
+import { OrmUtils } from "../../util/OrmUtils";
+import { ApplyValueTransformers } from "../../util/ApplyValueTransformers";
 
 /**
  * Organizes communication with SQL Server DBMS.
@@ -222,7 +222,7 @@ export class SqlServerDriver implements Driver {
         // Object.assign(connection.options, DriverUtils.buildDriverOptions(connection.options)); // todo: do it better way
         // validate options to make sure everything is set
         // if (!this.options.host)
-            // throw new DriverOptionNotSetError("host");
+        // throw new DriverOptionNotSetError("host");
         // if (!this.options.username)
         //     throw new DriverOptionNotSetError("username");
         // if (!this.options.database)
@@ -294,7 +294,7 @@ export class SqlServerDriver implements Driver {
     /**
      * Creates a query runner used to execute database queries.
      */
-    createQueryRunner(mode: "master"|"slave" = "master") {
+    createQueryRunner(mode: "master" | "slave" = "master") {
         return new SqlServerQueryRunner(this, mode);
     }
 
@@ -446,7 +446,7 @@ export class SqlServerDriver implements Driver {
     /**
      * Creates a database type from a given column metadata.
      */
-    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number|null, scale?: number }): string {
+    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number | null, scale?: number }): string {
         if (column.type === Number || column.type === "integer") {
             return "int";
 
@@ -518,7 +518,7 @@ export class SqlServerDriver implements Driver {
     /**
      * Returns default column lengths, which is required on column creation.
      */
-    getColumnLength(column: ColumnMetadata|TableColumn): string {
+    getColumnLength(column: ColumnMetadata | TableColumn): string {
         if (column.length)
             return column.length.toString();
 
@@ -542,7 +542,7 @@ export class SqlServerDriver implements Driver {
             type += `(${column.precision},${column.scale})`;
 
         } else if (column.precision !== null && column.precision !== undefined) {
-            type +=  `(${column.precision})`;
+            type += `(${column.precision})`;
         }
 
         if (column.isArray)
@@ -599,7 +599,7 @@ export class SqlServerDriver implements Driver {
             if (!tableColumn)
                 return false; // we don't need new columns, we only need exist and changed
 
-            return  tableColumn.name !== columnMetadata.databaseName
+            return tableColumn.name !== columnMetadata.databaseName
                 || tableColumn.type !== this.normalizeType(columnMetadata)
                 || tableColumn.length !== columnMetadata.length
                 || tableColumn.precision !== columnMetadata.precision

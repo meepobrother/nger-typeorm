@@ -33,7 +33,7 @@ import { UpdateResult } from "../query-builder/result/UpdateResult";
 import { DeleteResult } from "../query-builder/result/DeleteResult";
 import { OracleDriver } from "../driver/oracle/OracleDriver";
 import { FindConditions } from "../find-options/FindConditions";
-import { IsolationLevel } from "../driver/types/IsolationLevel";
+import { IsolationLevel } from "../driver/driver-types/IsolationLevel";
 import { ObjectUtils } from "../util/ObjectUtils";
 
 /**

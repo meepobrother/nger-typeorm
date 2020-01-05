@@ -1,16 +1,16 @@
-import {ColumnType, Connection, EntityMetadata, ObjectLiteral, TableColumn} from "../..";
-import {DriverPackageNotInstalledError} from "../../error/DriverPackageNotInstalledError";
-import {ColumnMetadata} from "../../metadata/ColumnMetadata";
-import {PlatformTools} from "../../platform/PlatformTools";
-import {RdbmsSchemaBuilder} from "../../schema-builder/RdbmsSchemaBuilder";
-import {ApplyValueTransformers} from "../../util/ApplyValueTransformers";
-import {DateUtils} from "../../util/DateUtils";
-import {OrmUtils} from "../../util/OrmUtils";
-import {Driver} from "../Driver";
-import {DataTypeDefaults} from "../types/DataTypeDefaults";
-import {MappedColumnTypes} from "../types/MappedColumnTypes";
-import {SapConnectionOptions} from "./SapConnectionOptions";
-import {SapQueryRunner} from "./SapQueryRunner";
+import { ColumnType, Connection, EntityMetadata, ObjectLiteral, TableColumn } from "../..";
+import { DriverPackageNotInstalledError } from "../../error/DriverPackageNotInstalledError";
+import { ColumnMetadata } from "../../metadata/ColumnMetadata";
+import { PlatformTools } from "../../platform/PlatformTools";
+import { RdbmsSchemaBuilder } from "../../schema-builder/RdbmsSchemaBuilder";
+import { ApplyValueTransformers } from "../../util/ApplyValueTransformers";
+import { DateUtils } from "../../util/DateUtils";
+import { OrmUtils } from "../../util/OrmUtils";
+import { Driver } from "../Driver";
+import { DataTypeDefaults } from "../driver-types/DataTypeDefaults";
+import { MappedColumnTypes } from "../driver-types/MappedColumnTypes";
+import { SapConnectionOptions } from "./SapConnectionOptions";
+import { SapQueryRunner } from "./SapQueryRunner";
 
 /**
  * Organizes communication with SAP Hana DBMS.
@@ -248,7 +248,7 @@ export class SapDriver implements Driver {
     /**
      * Creates a query runner used to execute database queries.
      */
-    createQueryRunner(mode: "master"|"slave" = "master") {
+    createQueryRunner(mode: "master" | "slave" = "master") {
         return new SapQueryRunner(this, mode);
     }
 
@@ -391,7 +391,7 @@ export class SapDriver implements Driver {
     /**
      * Creates a database type from a given column metadata.
      */
-    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number|null, scale?: number }): string {
+    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number | null, scale?: number }): string {
         if (column.type === Number || column.type === "integer") {
             return "integer";
 
@@ -451,7 +451,7 @@ export class SapDriver implements Driver {
     /**
      * Returns default column lengths, which is required on column creation.
      */
-    getColumnLength(column: ColumnMetadata|TableColumn): string {
+    getColumnLength(column: ColumnMetadata | TableColumn): string {
         if (column.length)
             return column.length.toString();
 
@@ -487,7 +487,7 @@ export class SapDriver implements Driver {
             type += `(${column.precision},${column.scale})`;
 
         } else if (column.precision !== null && column.precision !== undefined) {
-            type +=  `(${column.precision})`;
+            type += `(${column.precision})`;
         }
 
         if (column.isArray)
@@ -559,7 +559,7 @@ export class SapDriver implements Driver {
             // console.log((columnMetadata.generationStrategy !== "uuid" && tableColumn.isGenerated !== columnMetadata.isGenerated));
             // console.log("==========================================");
 
-            return  tableColumn.name !== columnMetadata.databaseName
+            return tableColumn.name !== columnMetadata.databaseName
                 || tableColumn.type !== this.normalizeType(columnMetadata)
                 || tableColumn.length !== columnMetadata.length
                 || tableColumn.precision !== columnMetadata.precision
@@ -604,7 +604,6 @@ export class SapDriver implements Driver {
     protected loadDependencies(): void {
         try {
             this.client = PlatformTools.load("@sap/hdbext");
-
         } catch (e) { // todo: better error for browser env
             throw new DriverPackageNotInstalledError("SAP Hana", "hdb");
         }

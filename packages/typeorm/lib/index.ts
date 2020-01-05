@@ -117,7 +117,7 @@ export * from "./schema-builder/table/TableIndex";
 export * from "./schema-builder/table/TableUnique";
 export * from "./schema-builder/table/Table";
 export * from "./driver/mongodb/typings";
-export * from "./driver/types/DatabaseType";
+export * from "./driver/driver-types/DatabaseType";
 export * from "./driver/sqlserver/MssqlParameter";
 
 export { ConnectionOptionsReader } from "./connection/ConnectionOptionsReader";
@@ -158,7 +158,7 @@ export { EntitySchema } from "./entity-schema/EntitySchema";
 export { EntitySchemaColumnOptions } from "./entity-schema/EntitySchemaColumnOptions";
 export { EntitySchemaIndexOptions } from "./entity-schema/EntitySchemaIndexOptions";
 export { EntitySchemaRelationOptions } from "./entity-schema/EntitySchemaRelationOptions";
-export { ColumnType } from "./driver/types/ColumnTypes";
+export { ColumnType } from "./driver/driver-types/ColumnTypes";
 export { PromiseUtils } from "./util/PromiseUtils";
 
 // -------------------------------------------------------------------------
@@ -316,3 +316,56 @@ export function createQueryBuilder<Entity>(entityClass?: ObjectType<Entity> | st
 
     return getConnection(connectionName).createQueryBuilder();
 }
+
+export * from './driver/mongodb/MongoDriver'
+export * from './driver/sqljs/SqljsDriver'
+export * from './entity-manager/EntityManager'
+export * from './entity-manager/EntityManagerFactory'
+export * from './entity-manager/MongoEntityManager'
+export * from './entity-manager/SqljsEntityManager'
+export * from './platform/PlatformTools'
+export * from './repository/RepositoryFactory'
+export * from './metadata-args/MetadataArgsStorage'
+
+export * from './error/MetadataAlreadyExistsError'
+export * from './error/MetadataWithSuchNameAlreadyExistsError'
+export * from './error/MissingDriverError'
+export * from './error/MissingJoinColumnError'
+export * from './error/MissingJoinTableError'
+export * from './error/MissingPrimaryColumnError'
+export * from './error/MustBeEntityError'
+export * from './error/NamingStrategyNotFoundError'
+export * from './error/NoConnectionForRepositoryError'
+export * from './error/NoConnectionOptionError'
+export * from './error/NoNeedToReleaseEntityManagerError'
+export * from './error/NoVersionOrUpdateDateColumnError'
+export * from './error/OffsetWithoutLimitNotSupportedError'
+export * from './error/OptimisticLockCanNotBeUsedError'
+export * from './error/OptimisticLockVersionMismatchError'
+export * from './error/PersistedEntityNotFoundError'
+export * from './error/PessimisticLockTransactionRequiredError'
+export * from './error/PrimaryColumnCannotBeNullableError'
+export * from './error/QueryFailedError'
+export * from './error/QueryRunnerAlreadyReleasedError'
+export * from './error/QueryRunnerProviderAlreadyReleasedError'
+export * from './error/RepositoryNotFoundError'
+export * from './error/RepositoryNotTreeError'
+export * from './error/ReturningStatementNotSupportedError'
+export * from './error/SubjectRemovedAndUpdatedError'
+export * from './error/SubjectWithoutIdentifierError'
+export * from './error/TransactionAlreadyStartedError'
+export * from './error/TransactionNotStartedError'
+export * from './error/TreeRepositoryNotSupportedError'
+export * from './error/UpdateValuesMissingError'
+export * from './error/UsingJoinColumnIsNotAllowedError'
+export * from './error/UsingJoinColumnOnlyOnOneSideAllowedError'
+export * from './error/UsingJoinTableIsNotAllowedError'
+export * from './error/UsingJoinTableOnlyOnOneSideAllowedError'
+export * from './error/EntityColumnNotFound'
+export * from './error/EntityMetadataNotFoundError'
+export * from './error/EntityNotFoundError'
+export * from './error/FindRelationsNotFoundError'
+export * from './error/InitializedRelationError'
+export * from './error/InsertValuesMissingError'
+export * from './error/LimitOnUpdateNotSupportedError'
+export * from './error/LockNotSupportedOnGivenDriverError'

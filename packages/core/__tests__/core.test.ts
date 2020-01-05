@@ -1,6 +1,6 @@
 import { corePlatform, Module, getCurrentInjector } from '@nger/core'
 import { TypeormModule, TypeormHook } from '../lib'
-import { Entity, PrimaryGeneratedColumn, Column, QueryBuilder, Repository } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, QueryBuilder, Repository } from '@nger/typeorm-native'
 export class DefaultTypeormHook<T> extends TypeormHook<T>{
     before(qb: QueryBuilder<T>): void {
         console.log(qb, qb.alias)

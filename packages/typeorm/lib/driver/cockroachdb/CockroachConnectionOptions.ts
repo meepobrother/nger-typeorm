@@ -1,5 +1,5 @@
-import {BaseConnectionOptions} from "../../connection/BaseConnectionOptions";
-import {CockroachConnectionCredentialsOptions} from "./CockroachConnectionCredentialsOptions";
+import { BaseConnectionOptions } from "../../connection/BaseConnectionOptions";
+import { CockroachConnectionCredentialsOptions } from "./CockroachConnectionCredentialsOptions";
 
 /**
  * Cockroachdb-specific connection options.

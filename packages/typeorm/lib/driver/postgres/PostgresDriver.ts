@@ -1,24 +1,24 @@
-import {Driver} from "../Driver";
-import {ConnectionIsNotSetError} from "../../error/ConnectionIsNotSetError";
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {DriverPackageNotInstalledError} from "../../error/DriverPackageNotInstalledError";
-import {DriverUtils} from "../DriverUtils";
-import {ColumnMetadata} from "../../metadata/ColumnMetadata";
-import {PostgresQueryRunner} from "./PostgresQueryRunner";
-import {DateUtils} from "../../util/DateUtils";
-import {PlatformTools} from "../../platform/PlatformTools";
-import {Connection} from "../../connection/Connection";
-import {RdbmsSchemaBuilder} from "../../schema-builder/RdbmsSchemaBuilder";
-import {PostgresConnectionOptions} from "./PostgresConnectionOptions";
-import {MappedColumnTypes} from "../types/MappedColumnTypes";
-import {ColumnType} from "../types/ColumnTypes";
-import {QueryRunner} from "../../query-runner/QueryRunner";
-import {DataTypeDefaults} from "../types/DataTypeDefaults";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {PostgresConnectionCredentialsOptions} from "./PostgresConnectionCredentialsOptions";
-import {EntityMetadata} from "../../metadata/EntityMetadata";
-import {OrmUtils} from "../../util/OrmUtils";
-import {ApplyValueTransformers} from "../../util/ApplyValueTransformers";
+import { Driver } from "../Driver";
+import { ConnectionIsNotSetError } from "../../error/ConnectionIsNotSetError";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { DriverPackageNotInstalledError } from "../../error/DriverPackageNotInstalledError";
+import { DriverUtils } from "../DriverUtils";
+import { ColumnMetadata } from "../../metadata/ColumnMetadata";
+import { PostgresQueryRunner } from "./PostgresQueryRunner";
+import { DateUtils } from "../../util/DateUtils";
+import { PlatformTools } from "../../platform/PlatformTools";
+import { Connection } from "../../connection/Connection";
+import { RdbmsSchemaBuilder } from "../../schema-builder/RdbmsSchemaBuilder";
+import { PostgresConnectionOptions } from "./PostgresConnectionOptions";
+import { MappedColumnTypes } from "../driver-types/MappedColumnTypes";
+import { ColumnType } from "../driver-types/ColumnTypes";
+import { QueryRunner } from "../../query-runner/QueryRunner";
+import { DataTypeDefaults } from "../driver-types/DataTypeDefaults";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { PostgresConnectionCredentialsOptions } from "./PostgresConnectionCredentialsOptions";
+import { EntityMetadata } from "../../metadata/EntityMetadata";
+import { OrmUtils } from "../../util/OrmUtils";
+import { ApplyValueTransformers } from "../../util/ApplyValueTransformers";
 
 /**
  * Organizes communication with PostgreSQL DBMS.
@@ -387,7 +387,7 @@ export class PostgresDriver implements Driver {
     /**
      * Creates a query runner used to execute database queries.
      */
-    createQueryRunner(mode: "master"|"slave" = "master") {
+    createQueryRunner(mode: "master" | "slave" = "master") {
         return new PostgresQueryRunner(this, mode);
     }
 
@@ -533,7 +533,7 @@ export class PostgresDriver implements Driver {
                 value = value.split(",").filter(Boolean).map(Number);
             }
 
-        } else if (columnMetadata.type === "enum" || columnMetadata.type === "simple-enum" ) {
+        } else if (columnMetadata.type === "enum" || columnMetadata.type === "simple-enum") {
             if (columnMetadata.isArray) {
                 // manually convert enum array to array of values (pg does not support, see https://github.com/brianc/node-pg-types/issues/56)
                 value = value !== "{}" ? (value as string).substr(1, (value as string).length - 2).split(",") : [];
@@ -608,7 +608,7 @@ export class PostgresDriver implements Driver {
     /**
      * Creates a database type from a given column metadata.
      */
-    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number|null, scale?: number, isArray?: boolean }): string {
+    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number | null, scale?: number, isArray?: boolean }): string {
         if (column.type === Number || column.type === "int" || column.type === "int4") {
             return "integer";
 
@@ -732,7 +732,7 @@ export class PostgresDriver implements Driver {
         } else if (column.precision !== null && column.precision !== undefined && column.scale !== null && column.scale !== undefined) {
             type += "(" + column.precision + "," + column.scale + ")";
         } else if (column.precision !== null && column.precision !== undefined) {
-            type +=  "(" + column.precision + ")";
+            type += "(" + column.precision + ")";
         }
 
         if (column.type === "time without time zone") {

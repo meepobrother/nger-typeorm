@@ -1,24 +1,24 @@
-import {Driver} from "../Driver";
-import {ConnectionIsNotSetError} from "../../error/ConnectionIsNotSetError";
-import {ObjectLiteral} from "../../common/ObjectLiteral";
-import {DriverPackageNotInstalledError} from "../../error/DriverPackageNotInstalledError";
-import {DriverUtils} from "../DriverUtils";
-import {ColumnMetadata} from "../../metadata/ColumnMetadata";
-import {CockroachConnectionCredentialsOptions} from "./CockroachConnectionCredentialsOptions";
-import {CockroachConnectionOptions} from "./CockroachConnectionOptions";
-import {DateUtils} from "../../util/DateUtils";
-import {PlatformTools} from "../../platform/PlatformTools";
-import {Connection} from "../../connection/Connection";
-import {RdbmsSchemaBuilder} from "../../schema-builder/RdbmsSchemaBuilder";
-import {MappedColumnTypes} from "../types/MappedColumnTypes";
-import {ColumnType} from "../types/ColumnTypes";
-import {QueryRunner} from "../../query-runner/QueryRunner";
-import {DataTypeDefaults} from "../types/DataTypeDefaults";
-import {TableColumn} from "../../schema-builder/table/TableColumn";
-import {EntityMetadata} from "../../metadata/EntityMetadata";
-import {OrmUtils} from "../../util/OrmUtils";
-import {CockroachQueryRunner} from "./CockroachQueryRunner";
-import {ApplyValueTransformers} from "../../util/ApplyValueTransformers";
+import { Driver } from "../Driver";
+import { ConnectionIsNotSetError } from "../../error/ConnectionIsNotSetError";
+import { ObjectLiteral } from "../../common/ObjectLiteral";
+import { DriverPackageNotInstalledError } from "../../error/DriverPackageNotInstalledError";
+import { DriverUtils } from "../DriverUtils";
+import { ColumnMetadata } from "../../metadata/ColumnMetadata";
+import { CockroachConnectionCredentialsOptions } from "./CockroachConnectionCredentialsOptions";
+import { CockroachConnectionOptions } from "./CockroachConnectionOptions";
+import { DateUtils } from "../../util/DateUtils";
+import { PlatformTools } from "../../platform/PlatformTools";
+import { Connection } from "../../connection/Connection";
+import { RdbmsSchemaBuilder } from "../../schema-builder/RdbmsSchemaBuilder";
+import { MappedColumnTypes } from "../driver-types/MappedColumnTypes";
+import { ColumnType } from "../driver-types/ColumnTypes";
+import { QueryRunner } from "../../query-runner/QueryRunner";
+import { DataTypeDefaults } from "../driver-types/DataTypeDefaults";
+import { TableColumn } from "../../schema-builder/table/TableColumn";
+import { EntityMetadata } from "../../metadata/EntityMetadata";
+import { OrmUtils } from "../../util/OrmUtils";
+import { CockroachQueryRunner } from "./CockroachQueryRunner";
+import { ApplyValueTransformers } from "../../util/ApplyValueTransformers";
 
 /**
  * Organizes communication with Cockroach DBMS.
@@ -282,7 +282,7 @@ export class CockroachDriver implements Driver {
     /**
      * Creates a query runner used to execute database queries.
      */
-    createQueryRunner(mode: "master"|"slave" = "master") {
+    createQueryRunner(mode: "master" | "slave" = "master") {
         return new CockroachQueryRunner(this, mode);
     }
 
@@ -424,7 +424,7 @@ export class CockroachDriver implements Driver {
     /**
      * Creates a database type from a given column metadata.
      */
-    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number|null, scale?: number, isArray?: boolean, isGenerated?: boolean, generationStrategy?: "increment"|"uuid"|"rowid" }): string {
+    normalizeType(column: { type?: ColumnType, length?: number | string, precision?: number | null, scale?: number, isArray?: boolean, isGenerated?: boolean, generationStrategy?: "increment" | "uuid" | "rowid" }): string {
         if (column.type === Number || column.type === "integer" || column.type === "int" || column.type === "bigint" || column.type === "int64") {
             return "int8";
 
@@ -527,7 +527,7 @@ export class CockroachDriver implements Driver {
         } else if (column.precision !== null && column.precision !== undefined && column.scale !== null && column.scale !== undefined) {
             type += "(" + column.precision + "," + column.scale + ")";
         } else if (column.precision !== null && column.precision !== undefined) {
-            type +=  "(" + column.precision + ")";
+            type += "(" + column.precision + ")";
         }
 
         if (column.isArray)

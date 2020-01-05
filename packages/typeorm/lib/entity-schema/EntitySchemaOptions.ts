@@ -3,7 +3,7 @@ import { EntitySchemaIndexOptions } from "./EntitySchemaIndexOptions";
 import { EntitySchemaColumnOptions } from "./EntitySchemaColumnOptions";
 import { EntitySchemaRelationOptions } from "./EntitySchemaRelationOptions";
 import { OrderByCondition } from "../find-options/OrderByCondition";
-import { TableType } from "../metadata/types/TableTypes";
+import { TableType } from "../metadata/metadata-types/TableTypes";
 import { EntitySchemaUniqueOptions } from "./EntitySchemaUniqueOptions";
 import { EntitySchemaCheckOptions } from "./EntitySchemaCheckOptions";
 import { EntitySchemaExclusionOptions } from "./EntitySchemaExclusionOptions";

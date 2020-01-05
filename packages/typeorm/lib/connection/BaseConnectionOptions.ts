@@ -1,7 +1,7 @@
 import { EntitySchema } from "../entity-schema/EntitySchema";
 import { LoggerOptions } from "../logger/LoggerOptions";
 import { NamingStrategyInterface } from "../naming-strategy/NamingStrategyInterface";
-import { DatabaseType } from "../driver/types/DatabaseType";
+import { DatabaseType } from "../driver/driver-types/DatabaseType";
 import { Logger } from "../logger/Logger";
 
 /**
