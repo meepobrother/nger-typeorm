@@ -1,4 +1,4 @@
-import { SelectQueryBuilder, QueryBuilder, ReadStream } from "@nger/typeorm-native";
+import { SelectQueryBuilder, QueryBuilder, ReadStream } from "./typeorm-native";
 import { getCurrentInjector } from "@nger/core";
 import { TYPEORM_HOOK } from "./token";
 import { NgerConnection } from './Connection'

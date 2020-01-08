@@ -4,10 +4,10 @@ import {
     ConnectionManager,
     ConnectionOptions, EntityManager, getMetadataArgsStorage,
     getManager, useContainer, MetadataArgsStorage
-} from '@nger/typeorm-native';
+} from './typeorm-native';
 import { TYPEORM_OPTIONS, TYPEORM_NAME, TYPEORM_ENTITIES, TypeormHook, TYPEORM_HOOK } from './token';
 import { NgerConnectionManager } from './ConnectionManager';
-export * from '@nger/typeorm-native';
+export * from './typeorm-native';
 @Module({
     providers: [{
         provide: MetadataArgsStorage,
@@ -53,7 +53,7 @@ export class TypeormModule {
                             const options = injector.get(TYPEORM_OPTIONS)
                             const entities = injector.get(TYPEORM_ENTITIES, [])
                             const all = [...new Set(entities.flat())];
-                            const connection = manager.create({ ...options, entities: all })
+                            const connection = manager.create({ ...options, entities: all } as any)
                             return connection.connect();
                         }
                     },

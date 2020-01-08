@@ -1,4 +1,4 @@
-import { ConnectionManager, ConnectionOptions } from '@nger/typeorm-native'
+import { ConnectionManager, ConnectionOptions } from './typeorm-native'
 import { NgerConnection } from './Connection'
 import { Injectable, Injector } from '@nger/core';
 import { TYPEORM_NAME } from './token';

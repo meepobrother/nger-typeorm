@@ -1,4 +1,4 @@
-import { Connection, MongoDriver, ConnectionOptions, QueryRunner, EntityManager, ObjectType, EntitySchema, MongoEntityManager } from '@nger/typeorm-native'
+import { Connection, MongoDriver, ConnectionOptions, QueryRunner, EntityManager, ObjectType, EntitySchema, MongoEntityManager } from './typeorm-native'
 import { Injector, getCurrentInjector } from '@nger/core';
 import { NgerEntityManagerFactory } from './EntityManagerFactory';
 import { NgerMongoRepository } from './MongoRepository';

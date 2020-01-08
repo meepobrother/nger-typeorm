@@ -3,7 +3,7 @@ import {
     FindOneOptions, ObjectLiteral, FindOptionsUtils,
     FindManyOptions, RepositoryNotFoundError, EntityManager,
     TreeRepositoryNotSupportedError, RepositoryNotTreeError
-} from '@nger/typeorm-native'
+} from './typeorm-native'
 import { NgerConnection } from './Connection';
 import { Injector, getCurrentInjector } from '@nger/core';
 import { NgerRepository } from './Repository';

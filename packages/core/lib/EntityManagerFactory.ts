@@ -1,4 +1,4 @@
-import { QueryRunner, SqljsEntityManager, EntityManagerFactory, MongoDriver, SqljsDriver, MongoEntityManager } from '@nger/typeorm-native'
+import { QueryRunner, SqljsEntityManager, EntityManagerFactory, MongoDriver, SqljsDriver, MongoEntityManager } from './typeorm-native'
 import { NgerEntityManager } from './EntityManager'
 import { NgerConnection } from './Connection'
 export class NgerEntityManagerFactory extends EntityManagerFactory {

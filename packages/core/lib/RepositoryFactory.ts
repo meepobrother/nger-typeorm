@@ -1,4 +1,4 @@
-import { EntityMetadata, QueryRunner, MongoDriver, RepositoryFactory } from '@nger/typeorm-native'
+import { EntityMetadata, QueryRunner, MongoDriver, RepositoryFactory } from './typeorm-native'
 import { NgerEntityManager } from './EntityManager';
 import { NgerRepository } from './Repository';
 import { NgerTreeRepository } from './TreeRepository';
