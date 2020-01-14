@@ -17,16 +17,19 @@ export class TableForeignKey {
 
     /**
      * Column names which included by this foreign key.
+     * 外键包含的列名
      */
     columnNames: string[] = [];
 
     /**
      * Table referenced in the foreign key.
+     * 外键中引用的表
      */
     referencedTableName: string;
 
     /**
      * Column names which included by this foreign key.
+     * 外键包含的列名
      */
     referencedColumnNames: string[] = [];
 

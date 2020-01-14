@@ -17,6 +17,7 @@ export class TableIndex {
 
     /**
      * Columns included in this index.
+     * 索引中包含的列
      */
     columnNames: string[] = [];
 

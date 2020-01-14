@@ -17,6 +17,7 @@ export class TableUnique {
 
     /**
      * Columns that contains this constraint.
+     * 包含次约束的列
      */
     columnNames: string[] = [];
 
