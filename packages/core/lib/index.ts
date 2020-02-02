@@ -1,12 +1,13 @@
-import { Module, ModuleWithProviders, InjectionToken, Injector, Type, APP_INITIALIZER, StaticProvider, getCurrentInjector } from '@nger/core'
+import { Module, ModuleWithProviders, InjectionToken, Injector, Type, StaticProvider } from '@nger/core'
 import {
     getConnection, Connection,
     ConnectionManager,
     ConnectionOptions, EntityManager, getMetadataArgsStorage,
-    getManager, useContainer, MetadataArgsStorage
+    getManager, MetadataArgsStorage
 } from './typeorm-native';
-import { TYPEORM_OPTIONS, TYPEORM_NAME, TYPEORM_ENTITIES, TypeormHook, TYPEORM_HOOK } from './token';
+import { TYPEORM_NAME, TYPEORM_ENTITIES, TypeormHook, TYPEORM_HOOK } from './token';
 import { NgerConnectionManager } from './ConnectionManager';
+import { createRootProviders } from './util';
 export * from './typeorm-native';
 @Module({
     providers: [{
@@ -38,41 +39,7 @@ export class TypeormModule {
     static forRoot(options: ConnectionOptions | InjectionToken<ConnectionOptions>, hook?: Type<TypeormHook<any>>): ModuleWithProviders {
         return {
             ngModule: TypeormModule,
-            providers: [
-                hook ? {
-                    provide: TYPEORM_HOOK,
-                    useClass: hook,
-                    multi: true
-                } : [],
-                {
-                    provide: APP_INITIALIZER,
-                    useFactory: (injector: Injector) => {
-                        useContainer(injector)
-                        return async () => {
-                            const manager = injector.get(ConnectionManager)
-                            const options = injector.get(TYPEORM_OPTIONS)
-                            const entities = injector.get(TYPEORM_ENTITIES, [])
-                            const all = [...new Set(entities.flat())];
-                            const connection = manager.create({ ...options, entities: all } as any)
-                            return connection.connect();
-                        }
-                    },
-                    deps: [Injector],
-                    multi: true
-                }, {
-                    provide: TYPEORM_OPTIONS,
-                    useFactory: (injector: Injector) => {
-                        return options instanceof InjectionToken ? injector.get(options) : options;
-                    },
-                    deps: [Injector]
-                }, {
-                    provide: TYPEORM_NAME,
-                    useFactory: (injector: Injector) => {
-                        const options = injector.get(TYPEORM_OPTIONS)
-                        return options.name || 'default'
-                    },
-                    deps: [Injector]
-                }]
+            providers: createRootProviders(options, hook)
         }
     }
     static forFeature(entities: Type<any>[], hook?: Type<TypeormHook<any>>): ModuleWithProviders {
@@ -110,3 +77,4 @@ export class TypeormModule {
 
 export * from './token';
 export * from './SelectQueryBuilder'
+export * from './typeorm-postgres-env.module'
